@@ -2,55 +2,62 @@ title: Tenant Contact Form
 description: Tenant Contact Form
 components:
   - kind: start
-    title: Main contact
-    description: Main contact
-    name: contact
+    name: contact default
+    title: Default contact 
+  - kind: start
+    name: contact default address
+    title: Default contact address
   - kind: field
     name: Recipient
-    path: contact.address.recipient
+    path: tenant.contact.default.address.recipient
     title: Recipient's full name
     description: The name of the person or organization receiving the mail
     widget: text
   - kind: field
     name: Street
-    path: contact.address.street
+    path: tenant.contact.default.address.street
     title: House number and street name or PO box address
     description: The number and name of the street or the PO box address where the mail is delivered
     widget: text
   - kind: field
     name: City
-    path: contact.address.city
+    path: tenant.contact.default.address.city
     title: City or town name
     description: The name of the city or town where the mail is delivered
     widget: text
   - kind: field
     name: ProvinceStateCounty
-    path: contact.address.province_state_county
+    path: tenant.contact.default.address.province_state_county
     title: Province, state, or county name
+    optional: true
     description: The name of the province, state, or county where the mail is delivered
     widget: text
   - kind: field
     name: PostalCode
-    path: contact.address.postal_code
+    path: tenant.contact.default.address.postal_code
     title: Postal code
     description: The postal code where the mail is delivered
     widget: text
   - kind: field
     name: Country
-    path: contact.address.country
+    path: tenant.contact.default.address.country
     title: Country name
     description: The name of the country where the mail is delivered
     widget: choices
+  - kind: finish
+    name: contact default address
   - kind: field
     name: Phone
-    path: contact.phone
+    path: tenant.contact.default.phone
     title: Phone number
     description: The phone number for the tenant
     widget: text
   - kind: field
     name: Email
-    path: contact.email
+    path: tenant.contact.default.email
     title: Email
     description: The email for the tenant
     widget: text
-
+  - kind: finish
+    name: contact default
+ 
