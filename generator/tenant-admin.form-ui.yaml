@@ -1,5 +1,5 @@
-title: Tenant Contact Form
-description: Tenant Contact Form
+title: Tenant Admin Form
+description: Tenant Admin Form
 components:
   - kind: start =>
     name: tenant
@@ -246,4 +246,46 @@ components:
     title: Email
     description: The email of the tenant
     widget: text
+  - kind: finish <=
+  - kind: finish <=
+  - kind: start =>
+    name: tax
+    path: tenant.tax
+    title: Tenant tax
+  - kind: start =>
+    name: settings
+    path: tenant.tax.settings
+    title: Tenant tax settings
+  - kind: field
+    name: Country
+    relativePath: country
+    title: Country name
+    description: The name of the country used for tax purpose
+    widget: choices
+  - kind: field
+    name: Tax number
+    path: tax_number
+    title: Tax number
+    description: Tax number of the tenant
+    widget: text
+  - kind: finish <=
+  - kind: finish <=
+  - kind: start =>
+    name: tax
+    path: tenant.administrators
+    title: Tenant administrators
+  - kind: field
+    name: Recipient
+    relativePath: recipient
+    title: Recipient's full name
+    description: The name of the administrator receiving the mail
+    widget: text
+  - kind: field
+    name: Email
+    path: email
+    title: Email
+    description: The email of the tenant administrator
+    widget: text
+  - kind: finish <=
+  - kind: finish <=
   - kind: finish <=
