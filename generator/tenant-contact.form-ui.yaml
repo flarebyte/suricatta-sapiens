@@ -1,63 +1,74 @@
 title: Tenant Contact Form
 description: Tenant Contact Form
 components:
-  - kind: start
-    name: contact default
-    title: Default contact 
-  - kind: start
-    name: contact default address
-    title: Default contact address
+  - kind: start =>
+    name: tenant
+    path: tenant
+    title: Tenant 
+  - kind: start =>
+    name: contact
+    path: tenant.contact
+    title: Contact 
+  - kind: start =>
+    name: tenant.contact.default
+    path: default
+    title: Default
+  - kind: start =>
+    name: address
+    path: tenant.contact.default.address
+    title: Address
   - kind: field
     name: Recipient
-    path: tenant.contact.default.address.recipient
+    relativePath: recipient
     title: Recipient's full name
     description: The name of the person or organization receiving the mail
     widget: text
   - kind: field
     name: Street
-    path: tenant.contact.default.address.street
+    relativePath: street
     title: House number and street name or PO box address
     description: The number and name of the street or the PO box address where the mail is delivered
     widget: text
   - kind: field
     name: City
-    path: tenant.contact.default.address.city
+    relativePath: city
     title: City or town name
     description: The name of the city or town where the mail is delivered
     widget: text
   - kind: field
-    name: ProvinceStateCounty
-    path: tenant.contact.default.address.province_state_county
+    name: Province State County
+    relativePath: province_state_county
     title: Province, state, or county name
     optional: true
     description: The name of the province, state, or county where the mail is delivered
     widget: text
   - kind: field
-    name: PostalCode
-    path: tenant.contact.default.address.postal_code
+    name: Postal Code
+    relativePath: postal_code
     title: Postal code
     description: The postal code where the mail is delivered
     widget: text
   - kind: field
     name: Country
-    path: tenant.contact.default.address.country
+    relativePath: country
     title: Country name
     description: The name of the country where the mail is delivered
     widget: choices
-  - kind: finish
-    name: contact default address
+  - kind: finish <=
   - kind: field
     name: Phone
-    path: tenant.contact.default.phone
+    relativePath: phone
     title: Phone number
     description: The phone number for the tenant
     widget: text
   - kind: field
     name: Email
-    path: tenant.contact.default.email
+    path: email
     title: Email
-    description: The email for the tenant
+    description: The email of the tenant
     widget: text
-  - kind: finish
-    name: contact default
+  - kind: finish <=
+  - kind: finish <=
+  - kind: finish <=
+
  
