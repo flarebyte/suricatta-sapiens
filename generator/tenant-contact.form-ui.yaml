@@ -4,19 +4,19 @@ components:
   - kind: start =>
     name: tenant
     path: tenant
-    title: Tenant 
+    title: Tenant
   - kind: start =>
     name: contact
     path: tenant.contact
-    title: Contact 
+    title: Tenant contact
   - kind: start =>
-    name: tenant.contact.default
-    path: default
-    title: Default
+    name: default
+    path: tenant.contact.default
+    title: Tenant default contact
   - kind: start =>
     name: address
     path: tenant.contact.default.address
-    title: Address
+    title: Tenant default contact address
   - kind: field
     name: Recipient
     relativePath: recipient
@@ -70,5 +70,180 @@ components:
   - kind: finish <=
   - kind: finish <=
   - kind: finish <=
-
- 
+  - kind: start =>
+    name: tenant.contact.billing
+    path: billing
+    title: Tenant contact billing
+  - kind: start =>
+    name: address
+    path: tenant.contact.billing.address
+    title: Tenant contact billing address
+  - kind: field
+    name: Recipient
+    relativePath: recipient
+    title: Recipient's full name
+    description: The name of the person or organization receiving the mail
+    widget: text
+  - kind: field
+    name: Street
+    relativePath: street
+    title: House number and street name or PO box address
+    description: The number and name of the street or the PO box address where the mail is delivered
+    widget: text
+  - kind: field
+    name: City
+    relativePath: city
+    title: City or town name
+    description: The name of the city or town where the mail is delivered
+    widget: text
+  - kind: field
+    name: Province State County
+    relativePath: province_state_county
+    title: Province, state, or county name
+    optional: true
+    description: The name of the province, state, or county where the mail is delivered
+    widget: text
+  - kind: field
+    name: Postal Code
+    relativePath: postal_code
+    title: Postal code
+    description: The postal code where the mail is delivered
+    widget: text
+  - kind: field
+    name: Country
+    relativePath: country
+    title: Country name
+    description: The name of the country where the mail is delivered
+    widget: choices
+  - kind: finish <=
+  - kind: field
+    name: Phone
+    relativePath: phone
+    title: Phone number
+    description: The phone number for the tenant
+    widget: text
+  - kind: field
+    name: Email
+    path: email
+    title: Email
+    description: The email of the tenant
+    widget: text
+  - kind: finish <=
+  - kind: start =>
+    name: operations
+    path: tenant.contact.operations
+    title: Tenant contact operations
+  - kind: start =>
+    name: address
+    path: tenant.contact.operations.address
+    title: Tenant contact operations address
+  - kind: field
+    name: Recipient
+    relativePath: recipient
+    title: Recipient's full name
+    description: The name of the person or organization receiving the mail
+    widget: text
+  - kind: field
+    name: Street
+    relativePath: street
+    title: House number and street name or PO box address
+    description: The number and name of the street or the PO box address where the mail is delivered
+    widget: text
+  - kind: field
+    name: City
+    relativePath: city
+    title: City or town name
+    description: The name of the city or town where the mail is delivered
+    widget: text
+  - kind: field
+    name: Province State County
+    relativePath: province_state_county
+    title: Province, state, or county name
+    optional: true
+    description: The name of the province, state, or county where the mail is delivered
+    widget: text
+  - kind: field
+    name: Postal Code
+    relativePath: postal_code
+    title: Postal code
+    description: The postal code where the mail is delivered
+    widget: text
+  - kind: field
+    name: Country
+    relativePath: country
+    title: Country name
+    description: The name of the country where the mail is delivered
+    widget: choices
+  - kind: finish <=
+  - kind: field
+    name: Phone
+    relativePath: phone
+    title: Phone number
+    description: The phone number for the tenant
+    widget: text
+  - kind: field
+    name: Email
+    path: email
+    title: Email
+    description: The email of the tenant
+    widget: text
+  - kind: finish <=
+  - kind: start =>
+    name: security
+    path: tenant.contact.security
+    title: Tenant contact security
+  - kind: start =>
+    name: address
+    path: tenant.contact.security.address
+    title: Tenant contact security address
+  - kind: field
+    name: Recipient
+    relativePath: recipient
+    title: Recipient's full name
+    description: The name of the person or organization receiving the mail
+    widget: text
+  - kind: field
+    name: Street
+    relativePath: street
+    title: House number and street name or PO box address
+    description: The number and name of the street or the PO box address where the mail is delivered
+    widget: text
+  - kind: field
+    name: City
+    relativePath: city
+    title: City or town name
+    description: The name of the city or town where the mail is delivered
+    widget: text
+  - kind: field
+    name: Province State County
+    relativePath: province_state_county
+    title: Province, state, or county name
+    optional: true
+    description: The name of the province, state, or county where the mail is delivered
+    widget: text
+  - kind: field
+    name: Postal Code
+    relativePath: postal_code
+    title: Postal code
+    description: The postal code where the mail is delivered
+    widget: text
+  - kind: field
+    name: Country
+    relativePath: country
+    title: Country name
+    description: The name of the country where the mail is delivered
+    widget: choices
+  - kind: finish <=
+  - kind: field
+    name: Phone
+    relativePath: phone
+    title: Phone number
+    description: The phone number for the tenant
+    widget: text
+  - kind: field
+    name: Email
+    path: email
+    title: Email
+    description: The email of the tenant
+    widget: text
+  - kind: finish <=
