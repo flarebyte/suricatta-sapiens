@@ -1,3 +1,4 @@
+import 'package:app4152964/widgets/suricatta_text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -44,6 +45,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  final myTextController = TextEditingController();
 
   void _incrementCounter() {
     setState(() {
@@ -96,6 +98,16 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
             AppLocalizations.of(context)!.helloWorld
             ),
+            SuricattaTextField(
+                label: AppLocalizations.of(context)!.helloWorld,
+                hint: 'Some hint',
+                controller: myTextController,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter some text';
+                  }
+                  return null;
+                }),
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
@@ -109,5 +121,12 @@ class _MyHomePageState extends State<MyHomePage> {
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    myTextController.dispose();
+    super.dispose();
   }
 }

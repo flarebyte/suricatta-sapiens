@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class SuricattaTextField extends StatefulWidget {
-  SuricattaTextField({
+  const SuricattaTextField({
+    super.key,
     required this.label,
     required this.hint,
     required this.controller,
@@ -14,10 +15,10 @@ class SuricattaTextField extends StatefulWidget {
   final String? Function(String?) validator;
 
   @override
-  _SuricattaTextFieldState createState() => _SuricattaTextFieldState();
+  SuricattaTextFieldState createState() => SuricattaTextFieldState();
 }
 
-class _SuricattaTextFieldState extends State<SuricattaTextField> {
+class SuricattaTextFieldState extends State<SuricattaTextField> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -32,13 +33,13 @@ class _SuricattaTextFieldState extends State<SuricattaTextField> {
         children: [
           Text(
             widget.label,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           TextFormField(
             controller: widget.controller,
             decoration: InputDecoration(
