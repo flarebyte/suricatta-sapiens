@@ -95,15 +95,12 @@ class _MyHomePageState extends State<MyHomePage> {
           // wireframe for each widget.
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-            AppLocalizations.of(context)!.helloWorld
-            ),
             SuricattaTextField(
                 label: AppLocalizations.of(context)!.helloWorld,
                 hint: 'Some hint',
                 controller: myTextController,
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
+                  if (value == null || value.length<2) {
                     return 'Please enter some text';
                   }
                   return null;

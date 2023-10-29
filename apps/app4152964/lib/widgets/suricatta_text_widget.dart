@@ -19,6 +19,14 @@ class SuricattaTextField extends StatefulWidget {
 }
 
 class SuricattaTextFieldState extends State<SuricattaTextField> {
+  String _errorMessage = '';
+
+  void _setErrorMessage(String message) {
+    setState(() {
+      _errorMessage = message;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -40,14 +48,22 @@ class SuricattaTextFieldState extends State<SuricattaTextField> {
             ),
           ),
           const SizedBox(height: 8),
-          TextFormField(
-            controller: widget.controller,
-            decoration: InputDecoration(
-              hintText: widget.hint,
-              border: InputBorder.none,
-            ),
-            validator: widget.validator,
-          ),
+          TextField(
+              controller: widget.controller,
+              decoration: InputDecoration(
+                hintText: widget.hint,
+                border: InputBorder.none,
+              ),
+              onChanged: (text) {
+                final validated = widget.validator(text);
+                _setErrorMessage(validated ?? '');
+              }),
+          Text(_errorMessage,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.red,
+              ))
         ],
       ),
     );
