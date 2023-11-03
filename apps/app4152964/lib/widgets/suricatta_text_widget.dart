@@ -1,5 +1,69 @@
 import 'package:flutter/material.dart';
 
+enum Level { error, warning, info }
+
+enum Category { syntax, spelling, server }
+
+class Message {
+  String message;
+  Level level;
+  Category category;
+
+  Message(this.message, this.level, this.category);
+}
+
+IconData getLevelIcon(Level level) {
+  switch (level) {
+    case Level.error:
+      return Icons.error;
+    case Level.warning:
+      return Icons.warning;
+    case Level.info:
+      return Icons.info;
+    default:
+      return Icons.help;
+  }
+}
+
+IconData getCategoryIcon(Category category) {
+  switch (category) {
+    case Category.syntax:
+      return Icons.code;
+    case Category.spelling:
+      return Icons.spellcheck;
+    case Category.server:
+      return Icons.cloud;
+    default:
+      return Icons.help;
+  }
+}
+
+Color getLevelColor(Level level) {
+  switch (level) {
+    case Level.error:
+      return Colors.red;
+    case Level.warning:
+      return Colors.orange;
+    case Level.info:
+      return Colors.blue;
+    default:
+      return Colors.grey;
+  }
+}
+
+Color getCategoryColor(Category category) {
+  switch (category) {
+    case Category.syntax:
+      return Colors.purple;
+    case Category.spelling:
+      return Colors.green;
+    case Category.server:
+      return Colors.cyan;
+    default:
+      return Colors.grey;
+  }
+}
+
 class SuricattaTextField extends StatefulWidget {
   const SuricattaTextField({
     super.key,
@@ -12,18 +76,18 @@ class SuricattaTextField extends StatefulWidget {
   final String label;
   final String hint;
   final TextEditingController controller;
-  final String? Function(String?) validator;
+  final List<Message> Function(String?) validator;
 
   @override
   SuricattaTextFieldState createState() => SuricattaTextFieldState();
 }
 
 class SuricattaTextFieldState extends State<SuricattaTextField> {
-  String _errorMessage = '';
+  List<Message> messages = [];
 
-  void _setErrorMessage(String message) {
+  void _setMessages(List<Message> messages) {
     setState(() {
-      _errorMessage = message;
+      messages = messages;
     });
   }
 
@@ -56,14 +120,28 @@ class SuricattaTextFieldState extends State<SuricattaTextField> {
               ),
               onChanged: (text) {
                 final validated = widget.validator(text);
-                _setErrorMessage(validated ?? '');
+                _setMessages(validated ?? []);
               }),
-          Text(_errorMessage,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.red,
-              ))
+          ListView.builder(
+            itemCount: messages.length, // The number of messages
+            itemBuilder: (context, index) {
+              // Build each message item
+              return ListTile(
+                leading: Icon(
+                  getLevelIcon(messages[index].level),
+                  color: getLevelColor(
+                      messages[index].level),
+                ),
+                title: Text(messages[index].message),
+                trailing: Icon(
+                  getCategoryIcon(
+                      messages[index].category),
+                  color: getCategoryColor(
+                      messages[index].category),
+                ),
+              );
+            },
+          )
         ],
       ),
     );

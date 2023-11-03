@@ -101,9 +101,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 controller: myTextController,
                 validator: (value) {
                   if (value == null || value.length<2) {
-                    return 'Please enter some text';
+                    return [];
                   }
-                  return null;
+                  return [];
                 }),
             Text(
               '$_counter',
