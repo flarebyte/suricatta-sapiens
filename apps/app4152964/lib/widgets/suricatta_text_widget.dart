@@ -49,7 +49,7 @@ class SuricattaTextFieldState extends State<SuricattaTextField> {
               color: Colors.black,
             ),
           ),
-          const SizedBox(height: 8),
+          // const SizedBox(height: 8),
           TextField(
               controller: widget.controller,
               decoration: InputDecoration(
@@ -58,28 +58,26 @@ class SuricattaTextFieldState extends State<SuricattaTextField> {
               ),
               onChanged: (text) {
                 final validated = widget.validator(text);
-                _setMessages(validated ?? []);
+                _setMessages(validated);
               }),
-          ListView.builder(
-            itemCount: messages.length, // The number of messages
-            itemBuilder: (context, index) {
-              // Build each message item
-              return ListTile(
-                leading: Icon(
-                  getLevelIcon(messages[index].level),
-                  color: getLevelColor(
-                      messages[index].level),
-                ),
-                title: Text(messages[index].message),
-                trailing: Icon(
-                  getCategoryIcon(
-                      messages[index].category),
-                  color: getCategoryColor(
-                      messages[index].category),
-                ),
-              );
-            },
-          )
+          messages.isNotEmpty
+              ? ListView.builder(
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      leading: Icon(
+                        getLevelIcon(messages[index].level),
+                        color: getLevelColor(messages[index].level),
+                      ),
+                      title: Text(messages[index].message),
+                      trailing: Icon(
+                        getCategoryIcon(messages[index].category),
+                        color: getCategoryColor(messages[index].category),
+                      ),
+                    );
+                  },
+                )
+              : Text('No items to display'),
         ],
       ),
     );
