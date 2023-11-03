@@ -2,6 +2,8 @@ import 'package:app4152964/widgets/suricatta_text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import 'model/widget_model.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -101,7 +103,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 controller: myTextController,
                 validator: (value) {
                   if (value == null || value.length<2) {
-                    return [];
+                    return [Message("Invalid syntax", Level.error, Category.syntax)];
                   }
                   return [];
                 }),
