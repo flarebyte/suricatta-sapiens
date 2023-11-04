@@ -50,6 +50,72 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Menu button with icon
+                IconButton(
+                  icon: Icon(Icons.menu),
+                  onPressed: () {
+                    // TODO: implement menu functionality
+                  },
+                ),
+                // Dashboard button
+                TextButton(
+                  child: Text('Dashboard'),
+                  onPressed: () {
+                    // TODO: implement dashboard functionality
+                  },
+                ),
+                // Profile button
+                TextButton(
+                  child: Text('Profile'),
+                  onPressed: () {
+                    // TODO: implement profile functionality
+                  },
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Dropdown list
+                DropdownButton<String>(
+                  value: 'Option 1',
+                  items: [
+                    DropdownMenuItem(
+                      child: Text('Option 1'),
+                      value: 'Option 1',
+                    ),
+                    DropdownMenuItem(
+                      child: Text('Option 2'),
+                      value: 'Option 2',
+                    ),
+                    DropdownMenuItem(
+                      child: Text('Option 3'),
+                      value: 'Option 3',
+                    ),
+                  ],
+                  onChanged: (value) {
+                    // TODO: implement dropdown functionality
+                  },
+                ),
+                // Previous button
+                IconButton(
+                  icon: Icon(Icons.arrow_back),
+                  onPressed: () {
+                    // TODO: implement previous functionality
+                  },
+                ),
+                // Next button
+                IconButton(
+                  icon: Icon(Icons.arrow_forward),
+                  onPressed: () {
+                    // TODO: implement next functionality
+                  },
+                ),
+              ],
+            ),
             SuricattaTextField(
                 label: AppLocalizations.of(context)!.helloWorld,
                 hint: 'Some hint',
