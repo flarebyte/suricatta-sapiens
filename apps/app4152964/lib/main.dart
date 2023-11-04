@@ -73,6 +73,28 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Container(
+                padding: const EdgeInsets.all(8),
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: ListView(
+                    shrinkWrap: true,
+                    children: [
+                  // ListTile widget for the first location
+                  ListTile(
+                      leading: Icon(Icons.location_on), // Icon for the location
+                      title: Text('London'), // Name of the location
+                      subtitle: Text(
+                          'Capital of the United Kingdom'), // Description of the location
+                      trailing:
+                          Icon(Icons.arrow_forward), // Icon for navigation
+                      onTap: () {
+                        // TODO: implement navigation functionality
+                      }),
+                ])),
+            Container(
               padding: const EdgeInsets.all(8),
               margin: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
