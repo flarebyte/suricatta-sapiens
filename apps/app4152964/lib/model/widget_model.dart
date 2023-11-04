@@ -4,6 +4,8 @@ enum Level { error, warning, info }
 
 enum Category { syntax, spelling, server }
 
+enum NavigationPathStatus { empty, populated, warning, error, skipped }
+
 class Message {
   String message;
   Level level;
@@ -12,6 +14,14 @@ class Message {
   Message(this.message, this.level, this.category);
 }
 
+class NavigationPath {
+  String path;
+  String title;
+  String preview;
+  NavigationPathStatus status;
+
+  NavigationPath(this.path, this.title, this.preview, this.status);
+}
 IconData getLevelIcon(Level level) {
   switch (level) {
     case Level.error:
@@ -38,6 +48,23 @@ IconData getCategoryIcon(Category category) {
   }
 }
 
+IconData getNavigationPathStatusIcon(NavigationPathStatus status) {
+  switch (status) {
+    case NavigationPathStatus.populated:
+      return Icons.verified;
+    case NavigationPathStatus.error:
+      return Icons.error;
+    case NavigationPathStatus.warning:
+      return Icons.warning;
+    case NavigationPathStatus.empty:
+      return Icons.check_box_outline_blank;
+    case NavigationPathStatus.skipped:
+      return Icons.skip_next;
+    default:
+      return Icons.help;
+  }
+}
+
 Color getLevelColor(Level level) {
   switch (level) {
     case Level.error:
@@ -46,6 +73,23 @@ Color getLevelColor(Level level) {
       return Colors.orange;
     case Level.info:
       return Colors.blue;
+    default:
+      return Colors.grey;
+  }
+}
+
+Color getNavigationPathStatusColor(NavigationPathStatus status) {
+  switch (status) {
+    case NavigationPathStatus.populated:
+      return Colors.blue;
+    case NavigationPathStatus.error:
+      return Colors.red;
+    case NavigationPathStatus.warning:
+      return Colors.orange;
+    case NavigationPathStatus.empty:
+      return Colors.orange;
+    case NavigationPathStatus.skipped:
+      return Colors.grey;
     default:
       return Colors.grey;
   }
