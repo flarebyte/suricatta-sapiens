@@ -21,7 +21,9 @@ class SuricattaTextField extends StatefulWidget {
 }
 
 class SuricattaTextFieldState extends State<SuricattaTextField> {
-  List<Message> messages = [];
+  List<Message> messages = [
+    Message("Enter some text", Level.info, Category.syntax)
+  ];
 
   void _setMessages(List<Message> messages) {
     setState(() {
@@ -63,6 +65,7 @@ class SuricattaTextFieldState extends State<SuricattaTextField> {
           messages.isNotEmpty
               ? ListView.builder(
                   shrinkWrap: true,
+                  itemCount: messages.length,
                   itemBuilder: (context, index) {
                     return ListTile(
                       leading: Icon(
