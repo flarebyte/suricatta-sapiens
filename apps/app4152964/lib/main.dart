@@ -37,14 +37,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
   final myTextController = TextEditingController();
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +57,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return [
-                      Message("Enter some text:\n- Be relevant\n- Be concise", Level.info, Category.syntax),
+                      Message("Enter some text:\n- Be relevant\n- Be concise",
+                          Level.info, Category.syntax),
                     ];
                   }
                   if (value.isNotEmpty && value.length < 5) {
@@ -82,17 +76,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         Category.syntax)
                   ];
                 }),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }
