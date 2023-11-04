@@ -80,37 +80,21 @@ class _MyHomePageState extends State<MyHomePage> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  // Dropdown list
-                  DropdownButton<String>(
-                    value: 'Option 1',
-                    items: [
-                      DropdownMenuItem(
-                        child: Text('Option 1'),
-                        value: 'Option 1',
-                      ),
-                      DropdownMenuItem(
-                        child: Text('Option 2'),
-                        value: 'Option 2',
-                      ),
-                      DropdownMenuItem(
-                        child: Text('Option 3'),
-                        value: 'Option 3',
-                      ),
-                    ],
-                    onChanged: (value) {
-                      // TODO: implement dropdown functionality
-                    },
+                  Expanded(
+                    child: LinearProgressIndicator(
+                      value: 0.5, // Change this value to show the progress
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                      backgroundColor: Colors.grey,
+                    ),
                   ),
-                  // Previous button
                   IconButton(
                     icon: Icon(Icons.arrow_back),
                     onPressed: () {
                       // TODO: implement previous functionality
                     },
                   ),
-                  // Next button
                   IconButton(
                     icon: Icon(Icons.arrow_forward),
                     onPressed: () {
