@@ -8,6 +8,8 @@ void main() {
   runApp(const MyApp());
 }
 
+final RegExp regExpForWord = RegExp(r"[\w-._]+");
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -46,7 +48,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -63,8 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return [
-                      Message("Enter some text", Level.info, Category.syntax),
-
+                      Message("Enter some text:\n- Be relevant\n- Be concise", Level.info, Category.syntax),
                     ];
                   }
                   if (value.isNotEmpty && value.length < 5) {
@@ -74,7 +74,13 @@ class _MyHomePageState extends State<MyHomePage> {
                           "Misspelled word", Level.warning, Category.spelling)
                     ];
                   }
-                  return [ Message("Looks good so far", Level.info, Category.syntax)];
+                  return [
+                    Message("Looks good so far", Level.info, Category.syntax),
+                    Message(
+                        "${value.length} characters, ${regExpForWord.allMatches(value).length} words.",
+                        Level.info,
+                        Category.syntax)
+                  ];
                 }),
             Text(
               '$_counter',
