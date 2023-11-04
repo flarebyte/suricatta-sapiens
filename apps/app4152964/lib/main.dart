@@ -43,39 +43,35 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          title: Text(widget.title),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.menu),
+              tooltip: 'Menu',
+              onPressed: () {
+                // TODO: implement menu functionality
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.person),
+              tooltip: 'Profile',
+              onPressed: () {
+                // TODO: implement menu functionality
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.dashboard),
+              tooltip: 'Dashboard',
+              onPressed: () {
+                // TODO: implement menu functionality
+              },
+            ),
+          ]),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Menu button with icon
-                IconButton(
-                  icon: Icon(Icons.menu),
-                  onPressed: () {
-                    // TODO: implement menu functionality
-                  },
-                ),
-                // Dashboard button
-                TextButton(
-                  child: Text('Dashboard'),
-                  onPressed: () {
-                    // TODO: implement dashboard functionality
-                  },
-                ),
-                // Profile button
-                TextButton(
-                  child: Text('Profile'),
-                  onPressed: () {
-                    // TODO: implement profile functionality
-                  },
-                ),
-              ],
-            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
