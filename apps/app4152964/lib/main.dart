@@ -72,45 +72,53 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Dropdown list
-                DropdownButton<String>(
-                  value: 'Option 1',
-                  items: [
-                    DropdownMenuItem(
-                      child: Text('Option 1'),
-                      value: 'Option 1',
-                    ),
-                    DropdownMenuItem(
-                      child: Text('Option 2'),
-                      value: 'Option 2',
-                    ),
-                    DropdownMenuItem(
-                      child: Text('Option 3'),
-                      value: 'Option 3',
-                    ),
-                  ],
-                  onChanged: (value) {
-                    // TODO: implement dropdown functionality
-                  },
-                ),
-                // Previous button
-                IconButton(
-                  icon: Icon(Icons.arrow_back),
-                  onPressed: () {
-                    // TODO: implement previous functionality
-                  },
-                ),
-                // Next button
-                IconButton(
-                  icon: Icon(Icons.arrow_forward),
-                  onPressed: () {
-                    // TODO: implement next functionality
-                  },
-                ),
-              ],
+            Container(
+              padding: const EdgeInsets.all(8),
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Dropdown list
+                  DropdownButton<String>(
+                    value: 'Option 1',
+                    items: [
+                      DropdownMenuItem(
+                        child: Text('Option 1'),
+                        value: 'Option 1',
+                      ),
+                      DropdownMenuItem(
+                        child: Text('Option 2'),
+                        value: 'Option 2',
+                      ),
+                      DropdownMenuItem(
+                        child: Text('Option 3'),
+                        value: 'Option 3',
+                      ),
+                    ],
+                    onChanged: (value) {
+                      // TODO: implement dropdown functionality
+                    },
+                  ),
+                  // Previous button
+                  IconButton(
+                    icon: Icon(Icons.arrow_back),
+                    onPressed: () {
+                      // TODO: implement previous functionality
+                    },
+                  ),
+                  // Next button
+                  IconButton(
+                    icon: Icon(Icons.arrow_forward),
+                    onPressed: () {
+                      // TODO: implement next functionality
+                    },
+                  ),
+                ],
+              ),
             ),
             SuricattaTextField(
                 label: AppLocalizations.of(context)!.helloWorld,
