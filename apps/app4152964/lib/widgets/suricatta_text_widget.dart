@@ -21,14 +21,18 @@ class SuricattaTextField extends StatefulWidget {
 }
 
 class SuricattaTextFieldState extends State<SuricattaTextField> {
-  List<Message> messages = [
-    Message("Enter some text", Level.info, Category.syntax)
-  ];
+  List<Message> messages = [];
 
   void _setMessages(List<Message> updatedMessages) {
     setState(() {
       messages = updatedMessages;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    messages = widget.validator('');
   }
 
   @override
@@ -62,25 +66,24 @@ class SuricattaTextFieldState extends State<SuricattaTextField> {
                 final validated = widget.validator(text);
                 _setMessages(validated);
               }),
-          messages.isNotEmpty
-              ? ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: messages.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      leading: Icon(
-                        getLevelIcon(messages[index].level),
-                        color: getLevelColor(messages[index].level),
-                      ),
-                      title: Text(messages[index].message),
-                      trailing: Icon(
-                        getCategoryIcon(messages[index].category),
-                        color: getCategoryColor(messages[index].category),
-                      ),
-                    );
-                  },
-                )
-              : Text('No items to display'),
+
+          ListView.builder(
+            shrinkWrap: true,
+            itemCount: messages.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                leading: Icon(
+                  getLevelIcon(messages[index].level),
+                  color: getLevelColor(messages[index].level),
+                ),
+                title: Text(messages[index].message),
+                trailing: Icon(
+                  getCategoryIcon(messages[index].category),
+                  color: getCategoryColor(messages[index].category),
+                ),
+              );
+            },
+          )
         ],
       ),
     );

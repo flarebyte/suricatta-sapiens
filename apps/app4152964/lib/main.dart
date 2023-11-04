@@ -61,14 +61,20 @@ class _MyHomePageState extends State<MyHomePage> {
                 hint: 'Some hint',
                 controller: myTextController,
                 validator: (value) {
-                  if (value == null || value.length < 5) {
+                  if (value == null || value.isEmpty) {
+                    return [
+                      Message("Enter some text", Level.info, Category.syntax),
+
+                    ];
+                  }
+                  if (value.isNotEmpty && value.length < 5) {
                     return [
                       Message("Invalid syntax", Level.error, Category.syntax),
                       Message(
                           "Misspelled word", Level.warning, Category.spelling)
                     ];
                   }
-                  return [];
+                  return [ Message("Looks good so far", Level.info, Category.syntax)];
                 }),
             Text(
               '$_counter',
