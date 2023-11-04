@@ -25,9 +25,9 @@ class SuricattaTextFieldState extends State<SuricattaTextField> {
     Message("Enter some text", Level.info, Category.syntax)
   ];
 
-  void _setMessages(List<Message> messages) {
+  void _setMessages(List<Message> updatedMessages) {
     setState(() {
-      messages = messages;
+      messages = updatedMessages;
     });
   }
 
