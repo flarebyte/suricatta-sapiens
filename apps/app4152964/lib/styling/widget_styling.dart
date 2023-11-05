@@ -28,17 +28,17 @@ IconData getCategoryIcon(Category category) {
   }
 }
 
-IconData getNavigationPathStatusIcon(NavigationPathStatus status) {
+IconData getNavigationPathStatusIcon(DataStatus status) {
   switch (status) {
-    case NavigationPathStatus.populated:
+    case DataStatus.populated:
       return Icons.verified;
-    case NavigationPathStatus.error:
+    case DataStatus.error:
       return Icons.error;
-    case NavigationPathStatus.warning:
+    case DataStatus.warning:
       return Icons.warning;
-    case NavigationPathStatus.empty:
+    case DataStatus.empty:
       return Icons.check_box_outline_blank;
-    case NavigationPathStatus.skipped:
+    case DataStatus.skipped:
       return Icons.skip_next;
     default:
       return Icons.help;
@@ -58,17 +58,17 @@ Color getLevelColor(Level level) {
   }
 }
 
-Color getNavigationPathStatusColor(NavigationPathStatus status) {
+Color getNavigationPathStatusColor(DataStatus status) {
   switch (status) {
-    case NavigationPathStatus.populated:
+    case DataStatus.populated:
       return Colors.blue;
-    case NavigationPathStatus.error:
+    case DataStatus.error:
       return Colors.red;
-    case NavigationPathStatus.warning:
+    case DataStatus.warning:
       return Colors.orange;
-    case NavigationPathStatus.empty:
+    case DataStatus.empty:
       return Colors.orange;
-    case NavigationPathStatus.skipped:
+    case DataStatus.skipped:
       return Colors.grey;
     default:
       return Colors.grey;
