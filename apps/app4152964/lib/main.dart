@@ -3,13 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'model/widget_model.dart';
+import 'validator/widget_validator.dart';
 import 'widgets/suricatta_preview_nav_widget.dart';
 
 void main() {
   runApp(const MyApp());
 }
-
-final RegExp regExpForWord = RegExp(r"[\w-._]+");
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -112,28 +111,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 label: AppLocalizations.of(context)!.helloWorld,
                 hint: 'Some hint',
                 controller: myTextController,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return [
-                      Message("Enter some text:\n- Be relevant\n- Be concise",
-                          Level.info, Category.syntax),
-                    ];
-                  }
-                  if (value.isNotEmpty && value.length < 5) {
-                    return [
-                      Message("Invalid syntax", Level.error, Category.syntax),
-                      Message(
-                          "Misspelled word", Level.warning, Category.spelling)
-                    ];
-                  }
-                  return [
-                    Message("Looks good so far", Level.info, Category.syntax),
-                    Message(
-                        "${value.length} characters, ${regExpForWord.allMatches(value).length} words.",
-                        Level.info,
-                        Category.syntax)
-                  ];
-                }),
+                validator: validatorFancy),
           ],
         ),
       ),

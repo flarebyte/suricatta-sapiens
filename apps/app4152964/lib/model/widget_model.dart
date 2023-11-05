@@ -1,10 +1,8 @@
-import 'dart:collection';
-
 enum Level { error, warning, info }
 
 enum Category { syntax, spelling, server }
 
-enum DataStatus { empty, populated, warning, error, skipped }
+enum DataStatus { empty, populated, warning, error, skipped, unknown }
 
 enum WidgetKind { text, number }
 
@@ -27,7 +25,7 @@ class GenericPathDataMeta {
 
 class DataPreview {
   String text;
-  DataPreview(this.text);
+  DataPreview({required this.text});
 }
 
 class PathDataValue {
@@ -39,16 +37,37 @@ class PathDataValue {
   DataPreview preview;
   DataStatus status;
 
-  PathDataValue(this.path, this.genericPath, this.draft, this.loaded,
-      this.refreshed, this.preview, this.status);
+  PathDataValue(
+      {required this.path,
+      required this.genericPath,
+      required this.draft,
+      required this.loaded,
+      required this.refreshed,
+      required this.preview,
+      required this.status});
 }
 
-class PathDataValueEntry extends LinkedListEntry<PathDataValueEntry> {
-  final PathDataValue value;
-  PathDataValueEntry(this.value);
+class SuricattaDataNavigator {
+  List<GenericPathDataMeta> genericMetaList;
+  List<PathDataValue> pathDataValueList;
+  String currentPath;
+  SuricattaDataNavigator(
+      this.genericMetaList, this.pathDataValueList, this.currentPath);
+
+  findDataByPath(String path) {
+    return pathDataValueList.firstWhere(
+      (item) => item.path == path,
+      orElse: () => PathDataValue(
+          path: path,
+          genericPath: '',
+          draft: '',
+          loaded: '',
+          refreshed: '',
+          preview: DataPreview(text: ''),
+          status: DataStatus.unknown),
+    );
+  }
 }
-
-
 
 class NavigationPath {
   String path;
