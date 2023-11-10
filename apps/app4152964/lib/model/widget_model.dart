@@ -1,5 +1,3 @@
-import 'package:flutter/cupertino.dart';
-
 enum Level { error, warning, info }
 
 enum Category { syntax, spelling, server }
@@ -16,22 +14,19 @@ class Message {
   Message(this.message, this.level, this.category);
 }
 
-
-
 class PathDataMetadata {
   String title;
   WidgetKind widgetKind;
   List<Message> Function(String?) validator;
-  PathDataMetadata({ required this.title, required this.widgetKind, required this.validator});
-  factory PathDataMetadata.unknown(){
-    return
-      PathDataMetadata(
-        title: '',
-        widgetKind: WidgetKind.text,
-        validator: (value) => [],
-      );
-    }
-
+  PathDataMetadata(
+      {required this.title, required this.widgetKind, required this.validator});
+  factory PathDataMetadata.unknown() {
+    return PathDataMetadata(
+      title: '',
+      widgetKind: WidgetKind.text,
+      validator: (value) => [],
+    );
+  }
 }
 
 class DataPreview {
@@ -39,24 +34,41 @@ class DataPreview {
   DataPreview({required this.text});
 }
 
-class PathDataValue {
+class BasePathDataValue {
+  const BasePathDataValue._();
+  factory BasePathDataValue.unknown() {
+    return UnknownPathDataValue(DataStatus.unknown);
+  }
+
+  factory BasePathDataValue.empty(
+      String path, PathDataMetadata metadata, String rank) {
+    return PathDataValue(
+        path: path,
+        metadata: metadata,
+        rank: rank,
+        status: DataStatus.unknown,
+        draft: '',
+        loaded: null,
+        refreshed: null);
+  }
+}
+
+class PathDataValue extends BasePathDataValue {
   String path;
   PathDataMetadata metadata;
   String rank;
-  String draft;
-  String loaded;
-  String refreshed;
-  DataPreview preview;
+  String? draft;
+  String? loaded;
+  String? refreshed;
   DataStatus status;
 
   PathDataValue(
       {required this.path,
       required this.metadata,
       required this.rank,
-      required this.draft,
-      required this.loaded,
-      required this.refreshed,
-      required this.preview,
+      this.draft,
+      this.loaded,
+      this.refreshed,
       required this.status});
 
   factory PathDataValue.unknown() {
@@ -69,7 +81,11 @@ class PathDataValue {
         preview: DataPreview(text: ''),
         status: DataStatus.unknown);
   }
+}
 
+class UnknownPathDataValue extends BasePathDataValue {
+  final DataStatus status;
+  const UnknownPathDataValue(this.status) : super._();
 }
 
 class SuricattaDataNavigator {
@@ -86,7 +102,6 @@ class SuricattaDataNavigator {
           draft: '',
           loaded: '',
           refreshed: '',
-          preview: DataPreview(text: ''),
           status: DataStatus.unknown),
     );
   }
