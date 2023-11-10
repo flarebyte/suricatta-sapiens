@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 enum Level { error, warning, info }
 
 enum Category { syntax, spelling, server }
@@ -14,13 +16,22 @@ class Message {
   Message(this.message, this.level, this.category);
 }
 
-class GenericPathDataMeta {
-  String genericPath;
+
+
+class PathDataMetadata {
   String title;
   WidgetKind widgetKind;
   List<Message> Function(String?) validator;
-  GenericPathDataMeta(
-      this.genericPath, this.title, this.widgetKind, this.validator);
+  PathDataMetadata({ required this.title, required this.widgetKind, required this.validator});
+  factory PathDataMetadata.unknown(){
+    return
+      PathDataMetadata(
+        title: '',
+        widgetKind: WidgetKind.text,
+        validator: (value) => [],
+      );
+    }
+
 }
 
 class DataPreview {
@@ -30,7 +41,8 @@ class DataPreview {
 
 class PathDataValue {
   String path;
-  String genericPath;
+  PathDataMetadata metadata;
+  String rank;
   String draft;
   String loaded;
   String refreshed;
@@ -39,27 +51,38 @@ class PathDataValue {
 
   PathDataValue(
       {required this.path,
-      required this.genericPath,
+      required this.metadata,
+      required this.rank,
       required this.draft,
       required this.loaded,
       required this.refreshed,
       required this.preview,
       required this.status});
+
+  factory PathDataValue.unknown() {
+    return PathDataValue._(
+        path: '',
+        rank: '',
+        draft: '',
+        loaded: '',
+        refreshed: '',
+        preview: DataPreview(text: ''),
+        status: DataStatus.unknown);
+  }
+
 }
 
 class SuricattaDataNavigator {
-  List<GenericPathDataMeta> genericMetaList;
   List<PathDataValue> pathDataValueList;
   String currentPath;
-  SuricattaDataNavigator(
-      this.genericMetaList, this.pathDataValueList, this.currentPath);
+  SuricattaDataNavigator(this.pathDataValueList, this.currentPath);
 
   findDataByPath(String path) {
     return pathDataValueList.firstWhere(
       (item) => item.path == path,
       orElse: () => PathDataValue(
           path: path,
-          genericPath: '',
+          rank: '',
           draft: '',
           loaded: '',
           refreshed: '',
