@@ -40,9 +40,8 @@ sealed class BasePathDataValue {
 
   DataStatus get status => _status;
 
-  factory BasePathDataValue.unknown() {
-    return UnknownPathDataValue();
-  }
+  factory BasePathDataValue.unknown() => UnknownPathDataValue();
+
   factory BasePathDataValue.empty(
       String path, PathDataMetadata metadata, String rank) {
     return PathDataValue(
@@ -96,12 +95,21 @@ class PathDataValue extends BasePathDataValue {
 
 class UnknownPathDataValue extends BasePathDataValue {
   UnknownPathDataValue() : super(status: DataStatus.unknown);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UnknownPathDataValue && runtimeType == other.runtimeType;
+
+  @override
+  int get hashCode => 0;
 }
 
 class SuricattaDataNavigator {
   List<BasePathDataValue> pathDataValueList;
   String currentRank;
-  SuricattaDataNavigator(this.pathDataValueList, this.currentRank);
+  SuricattaDataNavigator(
+      {required this.pathDataValueList, required this.currentRank});
 
   BasePathDataValue findDataByPath(String path) {
     return pathDataValueList.firstWhere(
