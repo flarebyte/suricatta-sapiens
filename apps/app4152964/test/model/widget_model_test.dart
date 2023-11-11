@@ -83,5 +83,10 @@ void main() {
       final actual = navigator.findDataByRank('001:001');
       expect(actual, contactName);
     });
+
+    test('toRankList returns a list of rank in alphabetical order', () {
+      final actual = SuricattaDataNavigator.toRankList(simpleDataList);
+      expect(actual, ['001:001', '001:002', '001:003', '001:004']);
+    });
   });
 }

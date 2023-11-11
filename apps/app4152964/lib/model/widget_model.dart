@@ -132,12 +132,21 @@ class SuricattaDataNavigator {
       orElse: () => BasePathDataValue.unknown(),
     );
   }
+
   BasePathDataValue findDataByRank(String rank) {
     return pathDataValueList.firstWhere(
-          (item) => BasePathDataValue.hasRank(item, rank),
+      (item) => BasePathDataValue.hasRank(item, rank),
       orElse: () => BasePathDataValue.unknown(),
     );
   }
+
+  BasePathDataValue getCurrent() {
+    return findDataByRank(currentRank);
+  }
+
+  static List<String> toRankList(List<BasePathDataValue> valueList) =>
+      valueList.whereType<PathDataValue>().map((value) => value.rank).toList()
+        ..sort();
 }
 
 class NavigationPath {
