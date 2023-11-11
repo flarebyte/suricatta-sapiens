@@ -43,7 +43,9 @@ sealed class BasePathDataValue {
   factory BasePathDataValue.unknown() => UnknownPathDataValue();
 
   factory BasePathDataValue.empty(
-      String path, PathDataMetadata metadata, String rank) {
+      {required String path,
+      required PathDataMetadata metadata,
+      required String rank}) {
     return PathDataValue(
         path: path,
         metadata: metadata,
@@ -53,8 +55,14 @@ sealed class BasePathDataValue {
         loaded: null,
         refreshed: null);
   }
-  factory BasePathDataValue.some(DataStatus status, String path, metadata,
-      String rank, String draft, String loaded, String refreshed) {
+  factory BasePathDataValue.some(
+      {required DataStatus status,
+      required String path,
+      required metadata,
+      required String rank,
+      String? draft,
+      String? loaded,
+      String? refreshed}) {
     return PathDataValue(
       status: status,
       path: path,
