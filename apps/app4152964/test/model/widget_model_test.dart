@@ -46,40 +46,38 @@ void main() {
       contactCountry
     ];
     test('findDataByPath returns unknown for empty data', () {
-      final navigator =
-          SuricattaDataNavigator(pathDataValueList: [], currentRank: '');
+      final navigator = SuricattaDataNavigator(pathDataValueList: []);
       final actual = navigator.findDataByPath('');
       expect(actual, BasePathDataValue.unknown());
     });
 
     test('findDataByPath returns populated record', () {
-      final navigator = SuricattaDataNavigator(
-          pathDataValueList: simpleDataList, currentRank: '');
+      final navigator =
+          SuricattaDataNavigator(pathDataValueList: simpleDataList);
       final actual = navigator.findDataByPath('contact/name');
       expect(actual, contactName);
     });
     test('findDataByPath returns empty record', () {
-      final navigator = SuricattaDataNavigator(
-          pathDataValueList: simpleDataList, currentRank: '');
+      final navigator =
+          SuricattaDataNavigator(pathDataValueList: simpleDataList);
       final actual = navigator.findDataByPath('contact/country');
       expect(actual, contactCountry);
     });
     test('findDataByPath returns error record', () {
-      final navigator = SuricattaDataNavigator(
-          pathDataValueList: simpleDataList, currentRank: '');
+      final navigator =
+          SuricattaDataNavigator(pathDataValueList: simpleDataList);
       final actual = navigator.findDataByPath('contact/email');
       expect(actual, contactEmail);
     });
     test('findDataByRank returns unknown for empty data', () {
-      final navigator =
-          SuricattaDataNavigator(pathDataValueList: [], currentRank: '');
+      final navigator = SuricattaDataNavigator(pathDataValueList: []);
       final actual = navigator.findDataByRank('');
       expect(actual, BasePathDataValue.unknown());
     });
 
     test('findDataByRank returns populated record', () {
-      final navigator = SuricattaDataNavigator(
-          pathDataValueList: simpleDataList, currentRank: '');
+      final navigator =
+          SuricattaDataNavigator(pathDataValueList: simpleDataList);
       final actual = navigator.findDataByRank('001:001');
       expect(actual, contactName);
     });
