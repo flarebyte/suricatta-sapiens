@@ -122,9 +122,8 @@ class UnknownPathDataValue extends BasePathDataValue {
 
 class SuricattaDataNavigator {
   List<BasePathDataValue> pathDataValueList;
-  String currentRank;
-  SuricattaDataNavigator(
-      {required this.pathDataValueList, required this.currentRank});
+  String? currentRank;
+  SuricattaDataNavigator({required this.pathDataValueList});
 
   BasePathDataValue findDataByPath(String path) {
     return pathDataValueList.firstWhere(
@@ -141,7 +140,23 @@ class SuricattaDataNavigator {
   }
 
   BasePathDataValue getCurrent() {
-    return findDataByRank(currentRank);
+    if (currentRank is String) {
+      return findDataByRank(currentRank ?? '');
+    } else {
+      return BasePathDataValue.unknown();
+    }
+  }
+
+  String? first() {
+    final firstRank = toRankList(pathDataValueList).firstOrNull;
+    currentRank = firstRank;
+    return firstRank;
+  }
+
+  last() {
+    final lastRank = toRankList(pathDataValueList).firstOrNull;
+    currentRank = lastRank;
+    return lastRank;
   }
 
   static List<String> toRankList(List<BasePathDataValue> valueList) =>
