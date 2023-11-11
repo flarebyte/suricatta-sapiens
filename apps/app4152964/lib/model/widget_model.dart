@@ -84,14 +84,14 @@ class PathDataValue extends BasePathDataValue {
   String? refreshed;
 
   PathDataValue({
-    required DataStatus status,
+    required super.status,
     required this.path,
     required this.metadata,
     required this.rank,
     this.draft,
     this.loaded,
     this.refreshed,
-  }) : super(status: status);
+  });
 }
 
 class UnknownPathDataValue extends BasePathDataValue {
