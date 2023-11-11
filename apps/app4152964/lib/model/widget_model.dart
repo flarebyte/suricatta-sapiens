@@ -35,21 +35,36 @@ class DataPreview {
 }
 
 class BasePathDataValue {
-  const BasePathDataValue._();
-  factory BasePathDataValue.unknown() {
-    return UnknownPathDataValue(DataStatus.unknown);
-  }
+  DataStatus _status;
+  BasePathDataValue({required DataStatus status}) : _status = status;
 
+  DataStatus get status => _status;
+
+  factory BasePathDataValue.unknown() {
+    return UnknownPathDataValue();
+  }
   factory BasePathDataValue.empty(
       String path, PathDataMetadata metadata, String rank) {
     return PathDataValue(
         path: path,
         metadata: metadata,
         rank: rank,
-        status: DataStatus.unknown,
+        status: DataStatus.empty,
         draft: '',
         loaded: null,
         refreshed: null);
+  }
+  factory BasePathDataValue.some(DataStatus status, String path, metadata,
+      String rank, String draft, String loaded, String refreshed) {
+    return PathDataValue(
+      status: status,
+      path: path,
+      metadata: metadata,
+      rank: rank,
+      draft: draft,
+      loaded: loaded,
+      refreshed: refreshed,
+    );
   }
 }
 
@@ -60,49 +75,31 @@ class PathDataValue extends BasePathDataValue {
   String? draft;
   String? loaded;
   String? refreshed;
-  DataStatus status;
 
-  PathDataValue(
-      {required this.path,
-      required this.metadata,
-      required this.rank,
-      this.draft,
-      this.loaded,
-      this.refreshed,
-      required this.status});
-
-  factory PathDataValue.unknown() {
-    return PathDataValue._(
-        path: '',
-        rank: '',
-        draft: '',
-        loaded: '',
-        refreshed: '',
-        preview: DataPreview(text: ''),
-        status: DataStatus.unknown);
-  }
+  PathDataValue({
+    required DataStatus status,
+    required this.path,
+    required this.metadata,
+    required this.rank,
+    this.draft,
+    this.loaded,
+    this.refreshed,
+  }) : super(status: status);
 }
 
 class UnknownPathDataValue extends BasePathDataValue {
-  final DataStatus status;
-  const UnknownPathDataValue(this.status) : super._();
+  UnknownPathDataValue() : super(status: DataStatus.unknown);
 }
 
 class SuricattaDataNavigator {
-  List<PathDataValue> pathDataValueList;
-  String currentPath;
-  SuricattaDataNavigator(this.pathDataValueList, this.currentPath);
+  List<BasePathDataValue> pathDataValueList;
+  String currentRank;
+  SuricattaDataNavigator(this.pathDataValueList, this.currentRank);
 
-  findDataByPath(String path) {
+  BasePathDataValue findDataByPath(String path) {
     return pathDataValueList.firstWhere(
-      (item) => item.path == path,
-      orElse: () => PathDataValue(
-          path: path,
-          rank: '',
-          draft: '',
-          loaded: '',
-          refreshed: '',
-          status: DataStatus.unknown),
+      (item) => (item.status != DataStatus.unknown),
+      orElse: () => BasePathDataValue.unknown(),
     );
   }
 }
