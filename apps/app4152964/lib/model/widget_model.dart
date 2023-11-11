@@ -34,7 +34,7 @@ class DataPreview {
   DataPreview({required this.text});
 }
 
-class BasePathDataValue {
+sealed class BasePathDataValue {
   DataStatus _status;
   BasePathDataValue({required DataStatus status}) : _status = status;
 
@@ -65,6 +65,13 @@ class BasePathDataValue {
       loaded: loaded,
       refreshed: refreshed,
     );
+  }
+
+  static bool hasPath(BasePathDataValue value, String searchPath) {
+    return switch (value) {
+      UnknownPathDataValue() => false,
+      PathDataValue(path: var valuePath) => valuePath == searchPath
+    };
   }
 }
 
@@ -98,7 +105,7 @@ class SuricattaDataNavigator {
 
   BasePathDataValue findDataByPath(String path) {
     return pathDataValueList.firstWhere(
-      (item) => (item.status != DataStatus.unknown),
+      (item) => BasePathDataValue.hasPath(item, path),
       orElse: () => BasePathDataValue.unknown(),
     );
   }
