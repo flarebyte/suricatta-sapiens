@@ -80,6 +80,13 @@ sealed class BasePathDataValue {
       PathDataValue(path: var valuePath) => valuePath == searchPath
     };
   }
+
+  static bool hasRank(BasePathDataValue value, String searchRank) {
+    return switch (value) {
+      UnknownPathDataValue() => false,
+      PathDataValue(rank: var valueRank) => valueRank == searchRank
+    };
+  }
 }
 
 class PathDataValue extends BasePathDataValue {
@@ -122,6 +129,12 @@ class SuricattaDataNavigator {
   BasePathDataValue findDataByPath(String path) {
     return pathDataValueList.firstWhere(
       (item) => BasePathDataValue.hasPath(item, path),
+      orElse: () => BasePathDataValue.unknown(),
+    );
+  }
+  BasePathDataValue findDataByRank(String rank) {
+    return pathDataValueList.firstWhere(
+          (item) => BasePathDataValue.hasRank(item, rank),
       orElse: () => BasePathDataValue.unknown(),
     );
   }

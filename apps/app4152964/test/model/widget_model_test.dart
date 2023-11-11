@@ -70,5 +70,18 @@ void main() {
       final actual = navigator.findDataByPath('contact/email');
       expect(actual, contactEmail);
     });
+    test('findDataByRank returns unknown for empty data', () {
+      final navigator =
+          SuricattaDataNavigator(pathDataValueList: [], currentRank: '');
+      final actual = navigator.findDataByRank('');
+      expect(actual, BasePathDataValue.unknown());
+    });
+
+    test('findDataByRank returns populated record', () {
+      final navigator = SuricattaDataNavigator(
+          pathDataValueList: simpleDataList, currentRank: '');
+      final actual = navigator.findDataByRank('001:001');
+      expect(actual, contactName);
+    });
   });
 }
