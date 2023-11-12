@@ -102,5 +102,25 @@ void main() {
       expect(actualRank, '001:004');
       expect(navigator.getCurrent(), contactCountry);
     });
+
+    test('next returns next record', () {
+      final navigator =
+          SuricattaDataNavigator(pathDataValueList: simpleDataList);
+      navigator.first();
+      expect(navigator.next(), '001:002');
+      expect(navigator.next(), '001:003');
+      expect(navigator.next(), '001:004');
+      expect(navigator.next(), null);
+    });
+
+    test('previous returns previous record', () {
+      final navigator =
+          SuricattaDataNavigator(pathDataValueList: simpleDataList);
+      navigator.last();
+      expect(navigator.previous(), '001:003');
+      expect(navigator.previous(), '001:002');
+      expect(navigator.previous(), '001:001');
+      expect(navigator.previous(), null);
+    });
   });
 }

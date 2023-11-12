@@ -159,6 +159,28 @@ class SuricattaDataNavigator {
     return lastRank;
   }
 
+  String? next() {
+    final ranks = toRankList(pathDataValueList);
+    final indexCurrent = ranks.indexOf(currentRank ?? '');
+    if (indexCurrent < ranks.length - 1) {
+      currentRank = ranks[indexCurrent + 1];
+      return currentRank;
+    } else {
+      return null;
+    }
+  }
+
+  String? previous() {
+    final ranks = toRankList(pathDataValueList);
+    final indexCurrent = ranks.indexOf(currentRank ?? '');
+    if (indexCurrent > 0) {
+      currentRank = ranks[indexCurrent - 1];
+      return currentRank;
+    } else {
+      return null;
+    }
+  }
+
   static List<String> toRankList(List<BasePathDataValue> valueList) =>
       valueList.whereType<PathDataValue>().map((value) => value.rank).toList()
         ..sort();
