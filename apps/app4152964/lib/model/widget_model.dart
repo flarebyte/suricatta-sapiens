@@ -120,9 +120,17 @@ class UnknownPathDataValue extends BasePathDataValue {
   int get hashCode => 0;
 }
 
+class SuricattaDataNavigatorException implements Exception {
+  final String message;
+  SuricattaDataNavigatorException(this.message);
+  @override
+  String toString() => message ?? 'Fail from navigation';
+}
+
 class SuricattaDataNavigator {
   List<BasePathDataValue> pathDataValueList;
   String? currentRank;
+  String? possibleRank;
   SuricattaDataNavigator({required this.pathDataValueList});
 
   BasePathDataValue findDataByPath(String path) {
@@ -147,38 +155,61 @@ class SuricattaDataNavigator {
     }
   }
 
-  String? first() {
+  PathDataValue getCurrentValue() {
+    if (currentRank is String) {
+      final maybeValue = findDataByRank(currentRank ?? '');
+      if (maybeValue is PathDataValue) {
+        return maybeValue;
+      }
+    }
+    throw SuricattaDataNavigatorException(
+        'Cannot get a current value for navigation');
+  }
+
+  bool hasCurrent() => (currentRank is String);
+
+  first() {
     final firstRank = toRankList(pathDataValueList).firstOrNull;
-    currentRank = firstRank;
-    return firstRank;
+    possibleRank = firstRank;
+    return this;
   }
 
-  String? last() {
+  last() {
     final lastRank = toRankList(pathDataValueList).lastOrNull;
-    currentRank = lastRank;
-    return lastRank;
+    possibleRank = lastRank;
+    return this;
   }
 
-  String? next() {
+  next() {
     final ranks = toRankList(pathDataValueList);
     final indexCurrent = ranks.indexOf(currentRank ?? '');
     if (indexCurrent < ranks.length - 1) {
-      currentRank = ranks[indexCurrent + 1];
-      return currentRank;
+      possibleRank = ranks[indexCurrent + 1];
     } else {
-      return null;
+      possibleRank = null;
     }
+    print(possibleRank);
+    return this;
   }
 
-  String? previous() {
+  previous() {
     final ranks = toRankList(pathDataValueList);
     final indexCurrent = ranks.indexOf(currentRank ?? '');
     if (indexCurrent > 0) {
-      currentRank = ranks[indexCurrent - 1];
-      return currentRank;
+      possibleRank = ranks[indexCurrent - 1];
     } else {
-      return null;
+      possibleRank = null;
     }
+    return this;
+  }
+
+  bool canMove() => (possibleRank is String);
+
+  move() {
+    if (possibleRank != null) {
+      currentRank = possibleRank;
+    }
+    return this;
   }
 
   static List<String> toRankList(List<BasePathDataValue> valueList) =>

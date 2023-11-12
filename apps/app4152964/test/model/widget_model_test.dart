@@ -90,37 +90,35 @@ void main() {
     test('first returns first record', () {
       final navigator =
           SuricattaDataNavigator(pathDataValueList: simpleDataList);
-      final actualRank = navigator.first();
-      expect(actualRank, '001:001');
-      expect(navigator.getCurrent(), contactName);
+      final actualRank = navigator.first().move().getCurrent();
+      expect(actualRank, contactName);
     });
 
     test('last returns last record', () {
       final navigator =
           SuricattaDataNavigator(pathDataValueList: simpleDataList);
-      final actualRank = navigator.last();
-      expect(actualRank, '001:004');
-      expect(navigator.getCurrent(), contactCountry);
+      final actual = navigator.last().move().getCurrent();
+      expect(actual, contactCountry);
     });
 
     test('next returns next record', () {
       final navigator =
           SuricattaDataNavigator(pathDataValueList: simpleDataList);
-      navigator.first();
-      expect(navigator.next(), '001:002');
-      expect(navigator.next(), '001:003');
-      expect(navigator.next(), '001:004');
-      expect(navigator.next(), null);
+      expect(navigator.first().move().getCurrentValue().rank, '001:001');
+      expect(navigator.next().move().getCurrentValue().rank, '001:002');
+      expect(navigator.next().move().getCurrentValue().rank, '001:003');
+      expect(navigator.next().move().getCurrentValue().rank, '001:004');
+      expect(navigator.next().canMove(), false);
     });
 
     test('previous returns previous record', () {
       final navigator =
           SuricattaDataNavigator(pathDataValueList: simpleDataList);
-      navigator.last();
-      expect(navigator.previous(), '001:003');
-      expect(navigator.previous(), '001:002');
-      expect(navigator.previous(), '001:001');
-      expect(navigator.previous(), null);
+      expect(navigator.last().move().getCurrentValue().rank, '001:004');
+      expect(navigator.previous().move().getCurrentValue().rank, '001:003');
+      expect(navigator.previous().move().getCurrentValue().rank, '001:002');
+      expect(navigator.previous().move().getCurrentValue().rank, '001:001');
+      expect(navigator.previous().canMove(), false);
     });
   });
 }
