@@ -86,5 +86,21 @@ void main() {
       final actual = SuricattaDataNavigator.toRankList(simpleDataList);
       expect(actual, ['001:001', '001:002', '001:003', '001:004']);
     });
+
+    test('first returns first record', () {
+      final navigator =
+          SuricattaDataNavigator(pathDataValueList: simpleDataList);
+      final actualRank = navigator.first();
+      expect(actualRank, '001:001');
+      expect(navigator.getCurrent(), contactName);
+    });
+
+    test('last returns last record', () {
+      final navigator =
+          SuricattaDataNavigator(pathDataValueList: simpleDataList);
+      final actualRank = navigator.last();
+      expect(actualRank, '001:004');
+      expect(navigator.getCurrent(), contactCountry);
+    });
   });
 }

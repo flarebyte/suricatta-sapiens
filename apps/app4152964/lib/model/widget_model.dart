@@ -153,8 +153,8 @@ class SuricattaDataNavigator {
     return firstRank;
   }
 
-  last() {
-    final lastRank = toRankList(pathDataValueList).firstOrNull;
+  String? last() {
+    final lastRank = toRankList(pathDataValueList).lastOrNull;
     currentRank = lastRank;
     return lastRank;
   }
