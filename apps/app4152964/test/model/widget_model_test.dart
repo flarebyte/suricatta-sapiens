@@ -146,5 +146,19 @@ void main() {
       expect(BasePathDataValueFilter.hasStatus(contactName, DataStatus.empty),
           false);
     });
+
+    test('hasAnyStatus should match if any status matching', () {
+      expect(
+          BasePathDataValueFilter.hasAnyStatus(
+              contactName, [DataStatus.empty, DataStatus.populated]),
+          true);
+    });
+
+    test('hasAnyStatus should not match if no status matching', () {
+      expect(
+          BasePathDataValueFilter.hasAnyStatus(
+              contactName, [DataStatus.empty, DataStatus.skipped]),
+          false);
+    });
   });
 }
