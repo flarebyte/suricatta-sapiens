@@ -40,6 +40,11 @@ sealed class BasePathDataValue {
 
   DataStatus get status => _status;
 
+  String? get rank => switch (this) {
+        UnknownPathDataValue() => null,
+        PathDataValue(rank: var valueRank) => valueRank
+      };
+
   factory BasePathDataValue.unknown() => UnknownPathDataValue();
 
   factory BasePathDataValue.empty(
@@ -189,6 +194,13 @@ class SuricattaDataNavigator {
   first() {
     final firstRank = toRankList(pathDataValueList).firstOrNull;
     possibleRank = firstRank;
+    return this;
+  }
+
+  firstWhere(bool Function(BasePathDataValue) where) {
+    final matched = pathDataValueList.firstWhere(where,
+        orElse: () => BasePathDataValue.unknown());
+    possibleRank = matched.rank;
     return this;
   }
 

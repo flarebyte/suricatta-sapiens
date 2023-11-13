@@ -116,6 +116,24 @@ void main() {
       expect(navigator.previous().move().getCurrentValue().rank, '001:001');
       expect(navigator.previous().canMove(), false);
     });
+
+    test('firstWhere returns matching a criteria', () {
+      final navigator =
+          SuricattaDataNavigator(pathDataValueList: simpleDataList);
+      final actual = navigator
+          .firstWhere((v) => BasePathDataValueFilter.hasRank(v, '001:003'))
+          .move()
+          .getCurrent();
+      expect(actual, contactEmail);
+    });
+
+    test('firstWhere should deal gracefully with no result', () {
+      final navigator =
+          SuricattaDataNavigator(pathDataValueList: simpleDataList);
+      final actual = navigator
+          .firstWhere((v) => BasePathDataValueFilter.hasRank(v, '001:111'));
+      expect(actual.canMove(), false);
+    });
   });
   group('BasePathDataValueFilter', () {
     test('hasPath should match if same path', () {
