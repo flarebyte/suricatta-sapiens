@@ -135,5 +135,16 @@ void main() {
     test('hasRank should not match if rank are different', () {
       expect(BasePathDataValueFilter.hasPath(contactName, '001:111'), false);
     });
+
+    test('hasStatus should match if same status', () {
+      expect(
+          BasePathDataValueFilter.hasStatus(contactName, DataStatus.populated),
+          true);
+    });
+
+    test('hasStatus should not match if status are different', () {
+      expect(BasePathDataValueFilter.hasStatus(contactName, DataStatus.empty),
+          false);
+    });
   });
 }

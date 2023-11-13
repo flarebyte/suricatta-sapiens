@@ -89,6 +89,13 @@ class BasePathDataValueFilter {
       PathDataValue(rank: var valueRank) => valueRank == searchRank
     };
   }
+
+  static bool hasStatus(BasePathDataValue value, DataStatus searchStatus) {
+    return switch (value) {
+      UnknownPathDataValue() => false,
+      PathDataValue(status: var valueStatus) => valueStatus == searchStatus
+    };
+  }
 }
 
 class PathDataValue extends BasePathDataValue {
