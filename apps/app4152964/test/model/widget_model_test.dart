@@ -1,50 +1,46 @@
 import 'package:app4152964/model/widget_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+final contactName = BasePathDataValue.some(
+    status: DataStatus.populated,
+    path: 'contact/name',
+    metadata: PathDataMetadata(
+        title: 'Contact name',
+        widgetKind: WidgetKind.text,
+        validator: (value) => []),
+    rank: '001:001',
+    draft: 'draft contact name');
+final contactCity = BasePathDataValue.some(
+    status: DataStatus.populated,
+    path: 'contact/city',
+    metadata: PathDataMetadata(
+        title: 'Contact city',
+        widgetKind: WidgetKind.text,
+        validator: (value) => []),
+    rank: '001:002',
+    draft: 'draft contact city');
+final contactEmail = BasePathDataValue.some(
+    status: DataStatus.error,
+    path: 'contact/email',
+    metadata: PathDataMetadata(
+        title: 'Contact city',
+        widgetKind: WidgetKind.text,
+        validator: (value) => []),
+    rank: '001:003',
+    draft: 'draft contact email');
+final contactCountry = BasePathDataValue.empty(
+  path: 'contact/country',
+  metadata: PathDataMetadata(
+      title: 'Contact country',
+      widgetKind: WidgetKind.text,
+      validator: (value) => []),
+  rank: '001:004',
+);
+
+final simpleDataList = [contactCity, contactEmail, contactName, contactCountry];
+
 void main() {
   group('SuricattaDataNavigator', () {
-    final contactName = BasePathDataValue.some(
-        status: DataStatus.populated,
-        path: 'contact/name',
-        metadata: PathDataMetadata(
-            title: 'Contact name',
-            widgetKind: WidgetKind.text,
-            validator: (value) => []),
-        rank: '001:001',
-        draft: 'draft contact name');
-    final contactCity = BasePathDataValue.some(
-        status: DataStatus.populated,
-        path: 'contact/city',
-        metadata: PathDataMetadata(
-            title: 'Contact city',
-            widgetKind: WidgetKind.text,
-            validator: (value) => []),
-        rank: '001:002',
-        draft: 'draft contact city');
-    final contactEmail = BasePathDataValue.some(
-        status: DataStatus.error,
-        path: 'contact/email',
-        metadata: PathDataMetadata(
-            title: 'Contact city',
-            widgetKind: WidgetKind.text,
-            validator: (value) => []),
-        rank: '001:003',
-        draft: 'draft contact email');
-    final contactCountry = BasePathDataValue.empty(
-      path: 'contact/country',
-      metadata: PathDataMetadata(
-          title: 'Contact country',
-          widgetKind: WidgetKind.text,
-          validator: (value) => []),
-      rank: '001:004',
-    );
-
-    final simpleDataList = [
-      contactCity,
-      contactEmail,
-      contactName,
-      contactCountry
-    ];
     test('findDataByPath returns unknown for empty data', () {
       final navigator = SuricattaDataNavigator(pathDataValueList: []);
       final actual = navigator.findDataByPath('');
@@ -119,6 +115,25 @@ void main() {
       expect(navigator.previous().move().getCurrentValue().rank, '001:002');
       expect(navigator.previous().move().getCurrentValue().rank, '001:001');
       expect(navigator.previous().canMove(), false);
+    });
+  });
+  group('BasePathDataValueFilter', () {
+    test('hasPath should match if same path', () {
+      expect(
+          BasePathDataValueFilter.hasPath(contactName, 'contact/name'), true);
+    });
+
+    test('hasPath should not match if path are different', () {
+      expect(BasePathDataValueFilter.hasPath(contactName, 'contact/whatever'),
+          false);
+    });
+
+    test('hasRank should match if same rank', () {
+      expect(BasePathDataValueFilter.hasRank(contactName, '001:001'), true);
+    });
+
+    test('hasRank should not match if rank are different', () {
+      expect(BasePathDataValueFilter.hasPath(contactName, '001:111'), false);
     });
   });
 }

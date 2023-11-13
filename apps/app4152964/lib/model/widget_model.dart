@@ -73,7 +73,9 @@ sealed class BasePathDataValue {
       refreshed: refreshed,
     );
   }
+}
 
+class BasePathDataValueFilter {
   static bool hasPath(BasePathDataValue value, String searchPath) {
     return switch (value) {
       UnknownPathDataValue() => false,
@@ -124,7 +126,7 @@ class SuricattaDataNavigatorException implements Exception {
   final String message;
   SuricattaDataNavigatorException(this.message);
   @override
-  String toString() => message ?? 'Fail from navigation';
+  String toString() => message;
 }
 
 class SuricattaDataNavigator {
@@ -135,14 +137,14 @@ class SuricattaDataNavigator {
 
   BasePathDataValue findDataByPath(String path) {
     return pathDataValueList.firstWhere(
-      (item) => BasePathDataValue.hasPath(item, path),
+      (item) => BasePathDataValueFilter.hasPath(item, path),
       orElse: () => BasePathDataValue.unknown(),
     );
   }
 
   BasePathDataValue findDataByRank(String rank) {
     return pathDataValueList.firstWhere(
-      (item) => BasePathDataValue.hasRank(item, rank),
+      (item) => BasePathDataValueFilter.hasRank(item, rank),
       orElse: () => BasePathDataValue.unknown(),
     );
   }
@@ -188,7 +190,6 @@ class SuricattaDataNavigator {
     } else {
       possibleRank = null;
     }
-    print(possibleRank);
     return this;
   }
 
