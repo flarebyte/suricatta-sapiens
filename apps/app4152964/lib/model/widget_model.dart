@@ -213,11 +213,23 @@ class SuricattaDataNavigator {
   next() {
     final ranks = toRankList(pathDataValueList);
     final indexCurrent = ranks.indexOf(currentRank ?? '');
-    if (indexCurrent < ranks.length - 1) {
+    if (indexCurrent >= 0 && indexCurrent < ranks.length - 1) {
       possibleRank = ranks[indexCurrent + 1];
     } else {
       possibleRank = null;
     }
+    return this;
+  }
+
+  nextWhere(bool Function(BasePathDataValue) where) {
+    final ranks = toRankList(pathDataValueList);
+    final indexCurrent = ranks.indexOf(currentRank ?? '');
+    final afterRanks = (indexCurrent >= 0 && indexCurrent < ranks.length - 2)
+        ? ranks.sublist(indexCurrent + 1)
+        : ranks;
+    final matched = pathDataValueList.firstWhere((value) => where(value),
+        orElse: () => BasePathDataValue.unknown());
+    possibleRank = matched.rank;
     return this;
   }
 
