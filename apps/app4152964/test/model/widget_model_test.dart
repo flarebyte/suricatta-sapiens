@@ -156,7 +156,7 @@ void main() {
               (v) => BasePathDataValueFilter.hasStatus(v, DataStatus.populated))
           .move()
           .getCurrent();
-      expect(actual, contactName);
+      expect(actual, contactCity);
     });
   });
   group('BasePathDataValueFilter', () {

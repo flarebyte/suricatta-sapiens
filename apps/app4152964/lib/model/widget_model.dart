@@ -129,6 +129,32 @@ class PathDataValue extends BasePathDataValue {
     this.loaded,
     this.refreshed,
   });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PathDataValue &&
+          runtimeType == other.runtimeType &&
+          path == other.path &&
+          metadata == other.metadata &&
+          rank == other.rank &&
+          draft == other.draft &&
+          loaded == other.loaded &&
+          refreshed == other.refreshed;
+
+  @override
+  int get hashCode =>
+      path.hashCode ^
+      metadata.hashCode ^
+      rank.hashCode ^
+      draft.hashCode ^
+      loaded.hashCode ^
+      refreshed.hashCode;
+
+  @override
+  String toString() {
+    return 'PathDataValue{path: $path, metadata: $metadata, rank: $rank, draft: $draft, loaded: $loaded, refreshed: $refreshed}';
+  }
 }
 
 class UnknownPathDataValue extends BasePathDataValue {
