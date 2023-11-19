@@ -2,7 +2,16 @@ enum Level { error, warning, info }
 
 enum Category { syntax, spelling, server }
 
-enum DataStatus { empty, populated, warning, error, skipped, unknown, section }
+enum DataStatus {
+  empty,
+  populated,
+  warning,
+  error,
+  skipped,
+  unknown,
+  starting,
+  ending
+}
 
 enum WidgetKind { text, number }
 
@@ -47,6 +56,7 @@ sealed class BasePathDataValue {
 
   String? get rank => switch (this) {
         UnknownPathDataValue() => null,
+        EndingSectionPathDataValue(rank: var valueRank) => valueRank,
         PathDataValue(rank: var valueRank) => valueRank,
         SectionPathDataValue(rank: var valueRank) => valueRank
       };
@@ -84,6 +94,21 @@ sealed class BasePathDataValue {
       refreshed: refreshed,
     );
   }
+  factory BasePathDataValue.start({
+    required String path,
+    required metadata,
+    required String rank,
+  }) {
+    return SectionPathDataValue(
+      status: DataStatus.starting,
+      path: path,
+      metadata: metadata,
+      rank: rank,
+    );
+  }
+
+  factory BasePathDataValue.ending({required String rank}) =>
+      EndingSectionPathDataValue(status: DataStatus.ending, rank: rank);
 }
 
 class BasePathDataValueFilter {
@@ -91,7 +116,8 @@ class BasePathDataValueFilter {
     return switch (value) {
       UnknownPathDataValue() => false,
       PathDataValue(path: var valuePath) => valuePath == searchPath,
-      SectionPathDataValue(path: var valuePath) => valuePath == searchPath
+      SectionPathDataValue(path: var valuePath) => valuePath == searchPath,
+      EndingSectionPathDataValue() => false,
     };
   }
 
@@ -99,7 +125,8 @@ class BasePathDataValueFilter {
     return switch (value) {
       UnknownPathDataValue() => false,
       PathDataValue(rank: var valueRank) => valueRank == searchRank,
-      SectionPathDataValue(rank: var valueRank) => valueRank == searchRank
+      SectionPathDataValue(rank: var valueRank) => valueRank == searchRank,
+      EndingSectionPathDataValue(rank: var valueRank) => valueRank == searchRank
     };
   }
 
@@ -108,7 +135,9 @@ class BasePathDataValueFilter {
       UnknownPathDataValue() => false,
       PathDataValue(status: var valueStatus) => valueStatus == searchStatus,
       SectionPathDataValue(status: var valueStatus) =>
-        valueStatus == searchStatus
+        valueStatus == searchStatus,
+      EndingSectionPathDataValue(status: var valueStatus) =>
+        valueStatus == searchStatus,
     };
   }
 
@@ -119,6 +148,8 @@ class BasePathDataValueFilter {
       PathDataValue(status: var valueStatus) =>
         searchStatusList.contains(valueStatus),
       SectionPathDataValue(status: var valueStatus) =>
+        searchStatusList.contains(valueStatus),
+      EndingSectionPathDataValue(status: var valueStatus) =>
         searchStatusList.contains(valueStatus)
     };
   }
@@ -209,6 +240,27 @@ class SectionPathDataValue extends BasePathDataValue {
   @override
   String toString() {
     return 'SectionPathDataValue{path: $path, metadata: $metadata, rank: $rank}';
+  }
+}
+
+class EndingSectionPathDataValue extends BasePathDataValue {
+  @override
+  String rank;
+  EndingSectionPathDataValue({required super.status, required this.rank});
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is EndingSectionPathDataValue &&
+          runtimeType == other.runtimeType &&
+          rank == other.rank;
+
+  @override
+  int get hashCode => rank.hashCode;
+
+  @override
+  String toString() {
+    return 'EndingSectionPathDataValue{rank: $rank}';
   }
 }
 

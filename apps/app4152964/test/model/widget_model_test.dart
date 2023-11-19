@@ -1,6 +1,12 @@
 import 'package:app4152964/model/widget_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+final contactSectionStart = BasePathDataValue.start(
+  path: 'contact',
+  metadata: SectionPathDataMetadata(title: 'Contact name'),
+  rank: '001:--',
+);
+final contactSectionEnd = BasePathDataValue.ending(rank: '001:>>');
 final contactName = BasePathDataValue.some(
     status: DataStatus.populated,
     path: 'contact/name',
@@ -37,7 +43,14 @@ final contactCountry = BasePathDataValue.empty(
   rank: '001:004',
 );
 
-final simpleDataList = [contactCity, contactEmail, contactName, contactCountry];
+final simpleDataList = [
+  contactCity,
+  contactEmail,
+  contactName,
+  contactCountry,
+  contactSectionEnd,
+  contactSectionStart
+];
 
 void main() {
   group('SuricattaDataNavigator', () {
