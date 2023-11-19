@@ -2,7 +2,7 @@ enum Level { error, warning, info }
 
 enum Category { syntax, spelling, server }
 
-enum DataStatus { empty, populated, warning, error, skipped, unknown }
+enum DataStatus { empty, populated, warning, error, skipped, unknown, section }
 
 enum WidgetKind { text, number }
 
@@ -29,6 +29,11 @@ class PathDataMetadata {
   }
 }
 
+class SectionPathDataMetadata {
+  String title;
+  SectionPathDataMetadata({required this.title});
+}
+
 class DataPreview {
   String text;
   DataPreview({required this.text});
@@ -42,7 +47,8 @@ sealed class BasePathDataValue {
 
   String? get rank => switch (this) {
         UnknownPathDataValue() => null,
-        PathDataValue(rank: var valueRank) => valueRank
+        PathDataValue(rank: var valueRank) => valueRank,
+        SectionPathDataValue(rank: var valueRank) => valueRank
       };
 
   factory BasePathDataValue.unknown() => UnknownPathDataValue();
@@ -84,21 +90,25 @@ class BasePathDataValueFilter {
   static bool hasPath(BasePathDataValue value, String searchPath) {
     return switch (value) {
       UnknownPathDataValue() => false,
-      PathDataValue(path: var valuePath) => valuePath == searchPath
+      PathDataValue(path: var valuePath) => valuePath == searchPath,
+      SectionPathDataValue(path: var valuePath) => valuePath == searchPath
     };
   }
 
   static bool hasRank(BasePathDataValue value, String searchRank) {
     return switch (value) {
       UnknownPathDataValue() => false,
-      PathDataValue(rank: var valueRank) => valueRank == searchRank
+      PathDataValue(rank: var valueRank) => valueRank == searchRank,
+      SectionPathDataValue(rank: var valueRank) => valueRank == searchRank
     };
   }
 
   static bool hasStatus(BasePathDataValue value, DataStatus searchStatus) {
     return switch (value) {
       UnknownPathDataValue() => false,
-      PathDataValue(status: var valueStatus) => valueStatus == searchStatus
+      PathDataValue(status: var valueStatus) => valueStatus == searchStatus,
+      SectionPathDataValue(status: var valueStatus) =>
+        valueStatus == searchStatus
     };
   }
 
@@ -107,6 +117,8 @@ class BasePathDataValueFilter {
     return switch (value) {
       UnknownPathDataValue() => false,
       PathDataValue(status: var valueStatus) =>
+        searchStatusList.contains(valueStatus),
+      SectionPathDataValue(status: var valueStatus) =>
         searchStatusList.contains(valueStatus)
     };
   }
@@ -115,6 +127,7 @@ class BasePathDataValueFilter {
 class PathDataValue extends BasePathDataValue {
   String path;
   PathDataMetadata metadata;
+  @override
   String rank;
   String? draft;
   String? loaded;
@@ -167,6 +180,36 @@ class UnknownPathDataValue extends BasePathDataValue {
 
   @override
   int get hashCode => 0;
+}
+
+class SectionPathDataValue extends BasePathDataValue {
+  String path;
+  SectionPathDataMetadata metadata;
+  @override
+  String rank;
+
+  SectionPathDataValue(
+      {required super.status,
+      required this.path,
+      required this.metadata,
+      required this.rank});
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SectionPathDataValue &&
+          runtimeType == other.runtimeType &&
+          path == other.path &&
+          metadata == other.metadata &&
+          rank == other.rank;
+
+  @override
+  int get hashCode => path.hashCode ^ metadata.hashCode ^ rank.hashCode;
+
+  @override
+  String toString() {
+    return 'SectionPathDataValue{path: $path, metadata: $metadata, rank: $rank}';
+  }
 }
 
 class SuricattaDataNavigatorException implements Exception {
