@@ -7,6 +7,13 @@ final contactSectionStart = BasePathDataValue.start(
   rank: '001:--',
 );
 final contactSectionEnd = BasePathDataValue.ending(rank: '001:>>');
+final contactNameTemplate = BasePathDataValue.template(
+    path: 'contact/name',
+    metadata: PathDataMetadata(
+        title: 'Contact name',
+        widgetKind: WidgetKind.text,
+        validator: (value) => []),
+    rank: '001:001');
 final contactName = BasePathDataValue.some(
     status: DataStatus.populated,
     path: 'contact/name',
@@ -16,6 +23,13 @@ final contactName = BasePathDataValue.some(
         validator: (value) => []),
     rank: '001:001',
     draft: 'draft contact name');
+final contactCityTemplate = BasePathDataValue.template(
+    path: 'contact/city',
+    metadata: PathDataMetadata(
+        title: 'Contact city',
+        widgetKind: WidgetKind.text,
+        validator: (value) => []),
+    rank: '001:002',);
 final contactCity = BasePathDataValue.some(
     status: DataStatus.populated,
     path: 'contact/city',
@@ -25,6 +39,14 @@ final contactCity = BasePathDataValue.some(
         validator: (value) => []),
     rank: '001:002',
     draft: 'draft contact city');
+final contactEmailTemplate = BasePathDataValue.template(
+    path: 'contact/email',
+    metadata: PathDataMetadata(
+        title: 'Contact city',
+        widgetKind: WidgetKind.text,
+        validator: (value) => []),
+    rank: '001:003',
+);
 final contactEmail = BasePathDataValue.some(
     status: DataStatus.error,
     path: 'contact/email',
@@ -34,6 +56,14 @@ final contactEmail = BasePathDataValue.some(
         validator: (value) => []),
     rank: '001:003',
     draft: 'draft contact email');
+final contactCountryTemplate = BasePathDataValue.template(
+  path: 'contact/country',
+  metadata: PathDataMetadata(
+      title: 'Contact country',
+      widgetKind: WidgetKind.text,
+      validator: (value) => []),
+  rank: '001:004',
+);
 final contactCountry = BasePathDataValue.empty(
   path: 'contact/country',
   metadata: PathDataMetadata(
@@ -49,7 +79,11 @@ final simpleDataList = [
   contactName,
   contactCountry,
   contactSectionEnd,
-  contactSectionStart
+  contactSectionStart,
+  contactNameTemplate,
+  contactCityTemplate,
+  contactEmailTemplate,
+  contactCountryTemplate
 ];
 
 void main() {

@@ -10,7 +10,9 @@ enum DataStatus {
   skipped,
   unknown,
   starting,
-  ending
+  ending,
+  todo,
+  template,
 }
 
 enum WidgetKind { text, number }
@@ -58,6 +60,7 @@ sealed class BasePathDataValue {
         UnknownPathDataValue() => null,
         EndingSectionPathDataValue(rank: var valueRank) => valueRank,
         PathDataValue(rank: var valueRank) => valueRank,
+        TemplatePathDataValue(rank: var valueRank) => valueRank,
         SectionPathDataValue(rank: var valueRank) => valueRank
       };
 
@@ -94,6 +97,15 @@ sealed class BasePathDataValue {
       refreshed: refreshed,
     );
   }
+  factory BasePathDataValue.template(
+      {required String path, required metadata, required String rank}) {
+    return PathDataValue(
+      status: DataStatus.template,
+      path: path,
+      metadata: metadata,
+      rank: rank,
+    );
+  }
   factory BasePathDataValue.start({
     required String path,
     required metadata,
@@ -116,6 +128,7 @@ class BasePathDataValueFilter {
     return switch (value) {
       UnknownPathDataValue() => false,
       PathDataValue(path: var valuePath) => valuePath == searchPath,
+      TemplatePathDataValue(path: var valuePath) => valuePath == searchPath,
       SectionPathDataValue(path: var valuePath) => valuePath == searchPath,
       EndingSectionPathDataValue() => false,
     };
@@ -125,6 +138,7 @@ class BasePathDataValueFilter {
     return switch (value) {
       UnknownPathDataValue() => false,
       PathDataValue(rank: var valueRank) => valueRank == searchRank,
+      TemplatePathDataValue(rank: var valueRank) => valueRank == searchRank,
       SectionPathDataValue(rank: var valueRank) => valueRank == searchRank,
       EndingSectionPathDataValue(rank: var valueRank) => valueRank == searchRank
     };
@@ -134,6 +148,7 @@ class BasePathDataValueFilter {
     return switch (value) {
       UnknownPathDataValue() => false,
       PathDataValue(status: var valueStatus) => valueStatus == searchStatus,
+      TemplatePathDataValue(status: var valueStatus) => valueStatus == searchStatus,
       SectionPathDataValue(status: var valueStatus) =>
         valueStatus == searchStatus,
       EndingSectionPathDataValue(status: var valueStatus) =>
@@ -141,12 +156,16 @@ class BasePathDataValueFilter {
     };
   }
 
+  static bool hasNotStatus(BasePathDataValue value, DataStatus searchStatus) => !hasStatus(value, searchStatus);
+
   static bool hasAnyStatus(
       BasePathDataValue value, List<DataStatus> searchStatusList) {
     return switch (value) {
       UnknownPathDataValue() => false,
       PathDataValue(status: var valueStatus) =>
         searchStatusList.contains(valueStatus),
+      TemplatePathDataValue(status: var valueStatus) =>
+          searchStatusList.contains(valueStatus),
       SectionPathDataValue(status: var valueStatus) =>
         searchStatusList.contains(valueStatus),
       EndingSectionPathDataValue(status: var valueStatus) =>
@@ -198,6 +217,35 @@ class PathDataValue extends BasePathDataValue {
   @override
   String toString() {
     return 'PathDataValue{path: $path, metadata: $metadata, rank: $rank, draft: $draft, loaded: $loaded, refreshed: $refreshed}';
+  }
+}
+
+class TemplatePathDataValue extends BasePathDataValue {
+  String path;
+  PathDataMetadata metadata;
+  @override
+  String rank;
+  TemplatePathDataValue(
+      {required super.status,
+      required this.path,
+      required this.metadata,
+      required this.rank});
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TemplatePathDataValue &&
+          runtimeType == other.runtimeType &&
+          path == other.path &&
+          metadata == other.metadata &&
+          rank == other.rank;
+
+  @override
+  int get hashCode => path.hashCode ^ metadata.hashCode ^ rank.hashCode;
+
+  @override
+  String toString() {
+    return 'TemplatePathDataValue{path: $path, metadata: $metadata, rank: $rank}';
   }
 }
 
@@ -375,7 +423,7 @@ class SuricattaDataNavigator {
   }
 
   static List<String> toRankList(List<BasePathDataValue> valueList) =>
-      valueList.whereType<PathDataValue>().map((value) => value.rank).toList()
+      valueList.whereType<PathDataValue>().map((value) => value.rank).toSet().toList()
         ..sort();
 }
 
