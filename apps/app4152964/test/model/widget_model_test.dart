@@ -64,6 +64,15 @@ final contactCountryTemplate = BasePathDataValue.template(
       validator: (value) => []),
   rank: '001:004',
 );
+
+final contactRegionTemplate = BasePathDataValue.template(
+  path: 'contact/region',
+  metadata: PathDataMetadata(
+      title: 'Contact region',
+      widgetKind: WidgetKind.text,
+      validator: (value) => []),
+  rank: '001:005',
+);
 final contactCountry = BasePathDataValue.empty(
   path: 'contact/country',
   metadata: PathDataMetadata(
@@ -83,7 +92,8 @@ final simpleDataList = [
   contactNameTemplate,
   contactCityTemplate,
   contactEmailTemplate,
-  contactCountryTemplate
+  contactCountryTemplate,
+  contactRegionTemplate
 ];
 
 void main() {
@@ -127,7 +137,7 @@ void main() {
 
     test('toRankList returns a list of rank in alphabetical order', () {
       final actual = SuricattaDataNavigator.toRankList(simpleDataList);
-      expect(actual, ['001:001', '001:002', '001:003', '001:004']);
+      expect(actual, ['001:001', '001:002', '001:003', '001:004', '001:005']);
     });
 
     test('first returns first record', () {

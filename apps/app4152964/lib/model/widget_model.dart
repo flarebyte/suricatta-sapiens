@@ -148,7 +148,8 @@ class BasePathDataValueFilter {
     return switch (value) {
       UnknownPathDataValue() => false,
       PathDataValue(status: var valueStatus) => valueStatus == searchStatus,
-      TemplatePathDataValue(status: var valueStatus) => valueStatus == searchStatus,
+      TemplatePathDataValue(status: var valueStatus) =>
+        valueStatus == searchStatus,
       SectionPathDataValue(status: var valueStatus) =>
         valueStatus == searchStatus,
       EndingSectionPathDataValue(status: var valueStatus) =>
@@ -156,7 +157,8 @@ class BasePathDataValueFilter {
     };
   }
 
-  static bool hasNotStatus(BasePathDataValue value, DataStatus searchStatus) => !hasStatus(value, searchStatus);
+  static bool hasNotStatus(BasePathDataValue value, DataStatus searchStatus) =>
+      !hasStatus(value, searchStatus);
 
   static bool hasAnyStatus(
       BasePathDataValue value, List<DataStatus> searchStatusList) {
@@ -165,7 +167,7 @@ class BasePathDataValueFilter {
       PathDataValue(status: var valueStatus) =>
         searchStatusList.contains(valueStatus),
       TemplatePathDataValue(status: var valueStatus) =>
-          searchStatusList.contains(valueStatus),
+        searchStatusList.contains(valueStatus),
       SectionPathDataValue(status: var valueStatus) =>
         searchStatusList.contains(valueStatus),
       EndingSectionPathDataValue(status: var valueStatus) =>
@@ -361,7 +363,7 @@ class SuricattaDataNavigator {
   bool hasCurrent() => (currentRank is String);
 
   first() {
-    final firstRank = toRankList(pathDataValueList).firstOrNull;
+    final firstRank = toActiveRankList(pathDataValueList).firstOrNull;
     possibleRank = firstRank;
     return this;
   }
@@ -374,13 +376,13 @@ class SuricattaDataNavigator {
   }
 
   last() {
-    final lastRank = toRankList(pathDataValueList).lastOrNull;
+    final lastRank = toActiveRankList(pathDataValueList).lastOrNull;
     possibleRank = lastRank;
     return this;
   }
 
   next() {
-    final ranks = toRankList(pathDataValueList);
+    final ranks = toActiveRankList(pathDataValueList);
     final indexCurrent = ranks.indexOf(currentRank ?? '');
     if (indexCurrent >= 0 && indexCurrent < ranks.length - 1) {
       possibleRank = ranks[indexCurrent + 1];
@@ -403,7 +405,7 @@ class SuricattaDataNavigator {
   }
 
   previous() {
-    final ranks = toRankList(pathDataValueList);
+    final ranks = toActiveRankList(pathDataValueList);
     final indexCurrent = ranks.indexOf(currentRank ?? '');
     if (indexCurrent > 0) {
       possibleRank = ranks[indexCurrent - 1];
@@ -422,9 +424,19 @@ class SuricattaDataNavigator {
     return this;
   }
 
-  static List<String> toRankList(List<BasePathDataValue> valueList) =>
-      valueList.whereType<PathDataValue>().map((value) => value.rank).toSet().toList()
-        ..sort();
+  static List<String> toRankList(List<BasePathDataValue> valueList) => valueList
+      .whereType<PathDataValue>()
+
+      .map((value) => value.rank)
+      .toSet()
+      .toList()
+    ..sort();
+
+  static List<String> toActiveRankList(List<BasePathDataValue> valueList) =>
+      toRankList(valueList
+          .where((value) =>
+              BasePathDataValueFilter.hasNotStatus(value, DataStatus.template))
+          .toList());
 }
 
 class NavigationPath {
