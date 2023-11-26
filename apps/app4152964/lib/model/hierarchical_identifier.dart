@@ -3,11 +3,12 @@ import 'package:collection/collection.dart';
 
 var deepEquality = DeepCollectionEquality();
 
+final noneHierarchicalIdentifier = HierarchicalIdentifier([]);
+
 class HierarchicalIdentifier {
   List<int> segments;
 
-  HierarchicalIdentifier(String id)
-      : segments = id.split(':').map(int.parse).toList();
+  HierarchicalIdentifier(this.segments);
 
   String idAsString() {
     return segments.map((s) => s.toString().padLeft(3, '0')).join(':');
@@ -25,12 +26,18 @@ class HierarchicalIdentifier {
     return other.isParentOf(this);
   }
 
+
   isSiblingOf(HierarchicalIdentifier other) {
     if (segments.length != other.segments.length) return false;
     for (int i = 0; i < segments.length - 1; i++) {
       if (segments[i] != other.segments[i]) return false;
     }
     return true;
+  }
+
+  getParent(){
+    if (segments.length == 0) return noneHierarchicalIdentifier;
+    return HierarchicalIdentifier(segments.sublist(0, segments.length - 1));
   }
 
   @override
@@ -46,9 +53,15 @@ class HierarchicalIdentifier {
           deepEquality.equals(segments, other.segments);
   @override
   int get hashCode => segments.hashCode;
+
+  factory HierarchicalIdentifier.fromString(String id) =>
+      HierarchicalIdentifier(id.split(':').map(int.parse).toList());
+
+  factory HierarchicalIdentifier.fromParentAndChildId(
+          HierarchicalIdentifier parent, int relativeId) =>
+      HierarchicalIdentifier(parent.segments + [relativeId]);
 }
 
-final noneHierarchicalIdentifier = HierarchicalIdentifier('000');
 
 class HierarchicalIdentifierBuilder {
   List<HierarchicalIdentifier> ids;
@@ -57,37 +70,34 @@ class HierarchicalIdentifierBuilder {
 
   HierarchicalIdentifier addChildTo(String id) {
     HierarchicalIdentifier parent = ids.firstWhere(
-        (h) => h == HierarchicalIdentifier(id),
+        (h) => h == HierarchicalIdentifier.fromString(id),
         orElse: () => noneHierarchicalIdentifier);
     if (parent == null) return noneHierarchicalIdentifier;
     int max = ids
         .where((h) => h.isChildOf(parent))
         .fold(0, (m, h) => h.segments.last > m ? h.segments.last : m);
     HierarchicalIdentifier child =
-        HierarchicalIdentifier(id + ':' + (max + 1).toString());
+        HierarchicalIdentifier.fromParentAndChildId(parent, max + 1);
     ids.add(child);
     return child;
   }
 
   HierarchicalIdentifier addSiblingTo(String id) {
     HierarchicalIdentifier current = ids.firstWhere(
-        (h) => h == HierarchicalIdentifier(id),
+        (h) => h == HierarchicalIdentifier.fromString(id),
         orElse: () => noneHierarchicalIdentifier);
     if (current == null) return noneHierarchicalIdentifier;
     int max = ids
         .where((h) => h.isSiblingOf(current))
         .fold(0, (m, h) => h.segments.last > m ? h.segments.last : m);
-    HierarchicalIdentifier sibling = HierarchicalIdentifier(
-        current.segments.sublist(0, current.segments.length - 1).join(':') +
-            ':' +
-            (max + 1).toString());
+    HierarchicalIdentifier sibling = HierarchicalIdentifier.fromParentAndChildId(current.getParent(), max + 1);
     ids.add(sibling);
     return sibling;
   }
 
   void delete(String id) {
     HierarchicalIdentifier target = ids.firstWhere(
-        (h) => h == HierarchicalIdentifier(id),
+        (h) => h == HierarchicalIdentifier.fromString(id),
         orElse: () => noneHierarchicalIdentifier);
     if (target == null) return;
     ids.removeWhere((h) => h == target || h.isChildOf(target));
