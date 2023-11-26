@@ -1,4 +1,7 @@
 import 'dart:core';
+import 'package:collection/collection.dart';
+
+var deepEquality = DeepCollectionEquality();
 
 class HierarchicalIdentifier {
   List<int> segments;
@@ -30,18 +33,19 @@ class HierarchicalIdentifier {
     return true;
   }
 
-  isEqualTo(HierarchicalIdentifier other) {
-    if (segments.length != other.segments.length) return false;
-    for (int i = 0; i < segments.length; i++) {
-      if (segments[i] != other.segments[i]) return false;
-    }
-    return true;
-  }
-
   @override
   String toString() {
     return 'HierarchicalIdentifier: ${idAsString()}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is HierarchicalIdentifier &&
+          runtimeType == other.runtimeType &&
+          deepEquality.equals(segments, other.segments);
+  @override
+  int get hashCode => segments.hashCode;
 }
 
 final noneHierarchicalIdentifier = HierarchicalIdentifier('000');
@@ -53,7 +57,7 @@ class HierarchicalIdentifierBuilder {
 
   HierarchicalIdentifier addChildTo(String id) {
     HierarchicalIdentifier parent = ids.firstWhere(
-        (h) => h.isEqualTo(HierarchicalIdentifier(id)),
+        (h) => h == HierarchicalIdentifier(id),
         orElse: () => noneHierarchicalIdentifier);
     if (parent == null) return noneHierarchicalIdentifier;
     int max = ids
@@ -67,7 +71,7 @@ class HierarchicalIdentifierBuilder {
 
   HierarchicalIdentifier addSiblingTo(String id) {
     HierarchicalIdentifier current = ids.firstWhere(
-        (h) => h.isEqualTo(HierarchicalIdentifier(id)),
+        (h) => h == HierarchicalIdentifier(id),
         orElse: () => noneHierarchicalIdentifier);
     if (current == null) return noneHierarchicalIdentifier;
     int max = ids
@@ -83,9 +87,9 @@ class HierarchicalIdentifierBuilder {
 
   void delete(String id) {
     HierarchicalIdentifier target = ids.firstWhere(
-        (h) => h.isEqualTo(HierarchicalIdentifier(id)),
+        (h) => h == HierarchicalIdentifier(id),
         orElse: () => noneHierarchicalIdentifier);
     if (target == null) return;
-    ids.removeWhere((h) => h.isEqualTo(target) || h.isChildOf(target));
+    ids.removeWhere((h) => h == target || h.isChildOf(target));
   }
 }

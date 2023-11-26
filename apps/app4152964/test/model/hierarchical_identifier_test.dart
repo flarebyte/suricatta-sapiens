@@ -2,24 +2,20 @@ import 'package:app4152964/model/hierarchical_identifier.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group('HierarchicalIdentifier', ()
-  {
-    test(
-        'should parse and format a string correctly', () {
+  group('HierarchicalIdentifier', () {
+    test('should parse and format a string correctly', () {
       final id = HierarchicalIdentifier('001:002:003');
       expect(id.idAsString(), '001:002:003');
     });
 
-    test(
-        'should recognize a parent-child relationship', () {
+    test('should recognize a parent-child relationship', () {
       final parent = HierarchicalIdentifier('001:002');
       final child = HierarchicalIdentifier('001:002:003');
       expect(parent.isParentOf(child), true);
       expect(child.isParentOf(parent), false);
     });
 
-    test(
-        'should recognize a child-parent relationship', () {
+    test('should recognize a child-parent relationship', () {
       final parent = HierarchicalIdentifier('001:002');
       final child = HierarchicalIdentifier('001:002:003');
       expect(child.isChildOf(parent), true);
@@ -40,10 +36,10 @@ void main() {
       final id1 = HierarchicalIdentifier('001:002:003');
       final id2 = HierarchicalIdentifier('001:002:003');
       final id3 = HierarchicalIdentifier('001:002:004');
-      expect(id1.isEqualTo(id2), true);
-      expect(id2.isEqualTo(id1), true);
-      expect(id1.isEqualTo(id3), false);
-      expect(id3.isEqualTo(id1), false);
+      expect(id1, id2);
+      expect(id2, id1);
+      expect(id1 == id3, false);
+      expect(id3 == id1, false);
     });
   });
 }
