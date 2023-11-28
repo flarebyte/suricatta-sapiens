@@ -24,12 +24,13 @@ final contactName = BasePathDataValue.some(
     rank: '001:001',
     draft: 'draft contact name');
 final contactCityTemplate = BasePathDataValue.template(
-    path: 'contact/city',
-    metadata: PathDataMetadata(
-        title: 'Contact city',
-        widgetKind: WidgetKind.text,
-        validator: (value) => []),
-    rank: '001:002',);
+  path: 'contact/city',
+  metadata: PathDataMetadata(
+      title: 'Contact city',
+      widgetKind: WidgetKind.text,
+      validator: (value) => []),
+  rank: '001:002',
+);
 final contactCity = BasePathDataValue.some(
     status: DataStatus.populated,
     path: 'contact/city',
@@ -40,12 +41,12 @@ final contactCity = BasePathDataValue.some(
     rank: '001:002',
     draft: 'draft contact city');
 final contactEmailTemplate = BasePathDataValue.template(
-    path: 'contact/email',
-    metadata: PathDataMetadata(
-        title: 'Contact city',
-        widgetKind: WidgetKind.text,
-        validator: (value) => []),
-    rank: '001:003',
+  path: 'contact/email',
+  metadata: PathDataMetadata(
+      title: 'Contact city',
+      widgetKind: WidgetKind.text,
+      validator: (value) => []),
+  rank: '001:003',
 );
 final contactEmail = BasePathDataValue.some(
     status: DataStatus.error,
@@ -95,42 +96,46 @@ final simpleDataList = [
   contactCountryTemplate,
   contactRegionTemplate
 ];
+final contactNameMeta = PathDataMetadata(
+    title: 'Contact name',
+    widgetKind: WidgetKind.text,
+    validator: (value) => []);
 
 void main() {
   group('SuricattaDataNavigator', () {
+    final refNavigator = SuricattaDataNavigator();
+    refNavigator.setRoot();
+    refNavigator.addStart('contact', SectionPathDataMetadata(title: 'Contact'));
+    refNavigator.addTemplate('contact/name', contactNameMeta);
     test('findDataByPath returns unknown for empty data', () {
-      final navigator = SuricattaDataNavigator(pathDataValueList: []);
+      final navigator = SuricattaDataNavigator();
       final actual = navigator.findDataByPath('');
       expect(actual, BasePathDataValue.unknown());
     });
 
     test('findDataByPath returns populated record', () {
-      final navigator =
-          SuricattaDataNavigator(pathDataValueList: simpleDataList);
+      final navigator = refNavigator;
       final actual = navigator.findDataByPath('contact/name');
       expect(actual, contactName);
     });
     test('findDataByPath returns empty record', () {
-      final navigator =
-          SuricattaDataNavigator(pathDataValueList: simpleDataList);
+      final navigator = refNavigator;
       final actual = navigator.findDataByPath('contact/country');
       expect(actual, contactCountry);
     });
     test('findDataByPath returns error record', () {
-      final navigator =
-          SuricattaDataNavigator(pathDataValueList: simpleDataList);
+      final navigator = refNavigator;
       final actual = navigator.findDataByPath('contact/email');
       expect(actual, contactEmail);
     });
     test('findDataByRank returns unknown for empty data', () {
-      final navigator = SuricattaDataNavigator(pathDataValueList: []);
+      final navigator = refNavigator;
       final actual = navigator.findDataByRank('');
       expect(actual, BasePathDataValue.unknown());
     });
 
     test('findDataByRank returns populated record', () {
-      final navigator =
-          SuricattaDataNavigator(pathDataValueList: simpleDataList);
+      final navigator = refNavigator;
       final actual = navigator.findDataByRank('001:001');
       expect(actual, contactName);
     });
@@ -141,22 +146,19 @@ void main() {
     });
 
     test('first returns first record', () {
-      final navigator =
-          SuricattaDataNavigator(pathDataValueList: simpleDataList);
+      final navigator = refNavigator;
       final actualRank = navigator.first().move().getCurrent();
       expect(actualRank, contactName);
     });
 
     test('last returns last record', () {
-      final navigator =
-          SuricattaDataNavigator(pathDataValueList: simpleDataList);
+      final navigator = refNavigator;
       final actual = navigator.last().move().getCurrent();
       expect(actual, contactCountry);
     });
 
     test('next returns next record', () {
-      final navigator =
-          SuricattaDataNavigator(pathDataValueList: simpleDataList);
+      final navigator = refNavigator;
       expect(navigator.first().move().getCurrentValue().rank, '001:001');
       expect(navigator.next().move().getCurrentValue().rank, '001:002');
       expect(navigator.next().move().getCurrentValue().rank, '001:003');
@@ -165,8 +167,7 @@ void main() {
     });
 
     test('previous returns previous record', () {
-      final navigator =
-          SuricattaDataNavigator(pathDataValueList: simpleDataList);
+      final navigator = refNavigator;
       expect(navigator.last().move().getCurrentValue().rank, '001:004');
       expect(navigator.previous().move().getCurrentValue().rank, '001:003');
       expect(navigator.previous().move().getCurrentValue().rank, '001:002');
@@ -175,8 +176,7 @@ void main() {
     });
 
     test('firstWhere returns matching a criteria', () {
-      final navigator =
-          SuricattaDataNavigator(pathDataValueList: simpleDataList);
+      final navigator = refNavigator;
       final actual = navigator
           .firstWhere((v) => BasePathDataValueFilter.hasRank(v, '001:003'))
           .move()
@@ -185,16 +185,14 @@ void main() {
     });
 
     test('firstWhere should deal gracefully with no result', () {
-      final navigator =
-          SuricattaDataNavigator(pathDataValueList: simpleDataList);
+      final navigator = refNavigator;
       final actual = navigator
           .firstWhere((v) => BasePathDataValueFilter.hasRank(v, '001:111'));
       expect(actual.canMove(), false);
     });
 
     test('nextWhere returns matching a criteria', () {
-      final navigator =
-          SuricattaDataNavigator(pathDataValueList: simpleDataList);
+      final navigator = refNavigator;
       final actual = navigator
           .nextWhere(
               (v) => BasePathDataValueFilter.hasStatus(v, DataStatus.error))
@@ -204,8 +202,7 @@ void main() {
     });
 
     test('nextWhere returns matching a criteria after first', () {
-      final navigator =
-          SuricattaDataNavigator(pathDataValueList: simpleDataList);
+      final navigator = refNavigator;
       final actual = navigator
           .first()
           .move()

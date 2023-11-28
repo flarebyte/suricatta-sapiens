@@ -26,7 +26,6 @@ class HierarchicalIdentifier {
     return other.isParentOf(this);
   }
 
-
   isSiblingOf(HierarchicalIdentifier other) {
     if (segments.length != other.segments.length) return false;
     for (int i = 0; i < segments.length - 1; i++) {
@@ -35,7 +34,7 @@ class HierarchicalIdentifier {
     return true;
   }
 
-  getParent(){
+  getParent() {
     if (segments.length == 0) return noneHierarchicalIdentifier;
     return HierarchicalIdentifier(segments.sublist(0, segments.length - 1));
   }
@@ -62,11 +61,22 @@ class HierarchicalIdentifier {
       HierarchicalIdentifier(parent.segments + [relativeId]);
 }
 
-
 class HierarchicalIdentifierBuilder {
   List<HierarchicalIdentifier> ids;
+  HierarchicalIdentifier _current = noneHierarchicalIdentifier;
+
+  HierarchicalIdentifier get current => _current;
+
+  set current(HierarchicalIdentifier value) {
+    _current = value;
+  }
 
   HierarchicalIdentifierBuilder() : ids = [];
+
+  setRoot(){
+    _current = HierarchicalIdentifier([0]);
+    ids.add(_current);
+  }
 
   HierarchicalIdentifier addChildTo(String id) {
     HierarchicalIdentifier parent = ids.firstWhere(
@@ -82,6 +92,8 @@ class HierarchicalIdentifierBuilder {
     return child;
   }
 
+  HierarchicalIdentifier addChild() => addChildTo(_current.idAsString());
+
   HierarchicalIdentifier addSiblingTo(String id) {
     HierarchicalIdentifier current = ids.firstWhere(
         (h) => h == HierarchicalIdentifier.fromString(id),
@@ -90,7 +102,9 @@ class HierarchicalIdentifierBuilder {
     int max = ids
         .where((h) => h.isSiblingOf(current))
         .fold(0, (m, h) => h.segments.last > m ? h.segments.last : m);
-    HierarchicalIdentifier sibling = HierarchicalIdentifier.fromParentAndChildId(current.getParent(), max + 1);
+    HierarchicalIdentifier sibling =
+        HierarchicalIdentifier.fromParentAndChildId(
+            current.getParent(), max + 1);
     ids.add(sibling);
     return sibling;
   }

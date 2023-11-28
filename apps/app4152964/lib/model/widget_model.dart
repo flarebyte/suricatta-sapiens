@@ -1,3 +1,5 @@
+import 'hierarchical_identifier.dart';
+
 enum Level { error, warning, info }
 
 enum Category { syntax, spelling, server }
@@ -108,7 +110,7 @@ sealed class BasePathDataValue {
   }
   factory BasePathDataValue.start({
     required String path,
-    required metadata,
+    required SectionPathDataMetadata metadata,
     required String rank,
   }) {
     return SectionPathDataValue(
@@ -322,10 +324,38 @@ class SuricattaDataNavigatorException implements Exception {
 }
 
 class SuricattaDataNavigator {
-  List<BasePathDataValue> pathDataValueList;
+  List<BasePathDataValue> pathDataValueList = [];
+  HierarchicalIdentifierBuilder hierarchicalIdentifierBuilder =
+      HierarchicalIdentifierBuilder();
   String? currentRank;
   String? possibleRank;
-  SuricattaDataNavigator({required this.pathDataValueList});
+  SuricattaDataNavigator();
+
+  setRoot() {
+    hierarchicalIdentifierBuilder.setRoot();
+  }
+
+  addTemplate(String path, PathDataMetadata metadata) {
+    final template = BasePathDataValue.template(
+        path: path,
+        metadata: metadata,
+        rank: hierarchicalIdentifierBuilder.addChild().idAsString());
+    pathDataValueList.add(template);
+  }
+
+  addStart(String path, SectionPathDataMetadata metadata) {
+    final start = BasePathDataValue.start(
+        path: path,
+        metadata: metadata,
+        rank: hierarchicalIdentifierBuilder.addChild().idAsString());
+    pathDataValueList.add(start);
+  }
+
+  addEnding(String path, SectionPathDataMetadata metadata) {
+    final ending = BasePathDataValue.ending(
+        rank: hierarchicalIdentifierBuilder.addChild().idAsString());
+    pathDataValueList.add(ending);
+  }
 
   BasePathDataValue findDataByPath(String path) {
     return pathDataValueList.firstWhere(
@@ -426,7 +456,6 @@ class SuricattaDataNavigator {
 
   static List<String> toRankList(List<BasePathDataValue> valueList) => valueList
       .whereType<PathDataValue>()
-
       .map((value) => value.rank)
       .toSet()
       .toList()
