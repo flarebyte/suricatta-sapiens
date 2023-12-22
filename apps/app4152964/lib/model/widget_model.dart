@@ -11,13 +11,12 @@ enum DataStatus {
   error,
   skipped,
   unknown,
-  starting,
-  ending,
   todo,
-  template,
 }
 
 enum WidgetKind { text, number }
+
+enum DataCategory { draft, loaded, refreshed, template, starting, ending }
 
 class Message {
   String message;
@@ -62,7 +61,6 @@ sealed class BasePathDataValue {
         UnknownPathDataValue() => null,
         EndingSectionPathDataValue(rank: var valueRank) => valueRank,
         PathDataValue(rank: var valueRank) => valueRank,
-        TemplatePathDataValue(rank: var valueRank) => valueRank,
         SectionPathDataValue(rank: var valueRank) => valueRank
       };
 
@@ -77,35 +75,32 @@ sealed class BasePathDataValue {
         metadata: metadata,
         rank: rank,
         status: DataStatus.empty,
-        draft: '',
-        loaded: null,
-        refreshed: null);
+        category: DataCategory.draft,
+        text: '');
   }
   factory BasePathDataValue.some(
       {required DataStatus status,
       required String path,
       required metadata,
       required String rank,
-      String? draft,
-      String? loaded,
-      String? refreshed}) {
+      String? text}) {
     return PathDataValue(
       status: status,
       path: path,
       metadata: metadata,
       rank: rank,
-      draft: draft,
-      loaded: loaded,
-      refreshed: refreshed,
+      category: DataCategory.draft,
+      text: text,
     );
   }
   factory BasePathDataValue.template(
       {required String path, required metadata, required String rank}) {
     return PathDataValue(
-      status: DataStatus.template,
+      status: DataStatus.empty,
       path: path,
       metadata: metadata,
       rank: rank,
+      category: DataCategory.template,
     );
   }
   factory BasePathDataValue.start({
@@ -114,7 +109,7 @@ sealed class BasePathDataValue {
     required String rank,
   }) {
     return SectionPathDataValue(
-      status: DataStatus.starting,
+      status: DataStatus.empty,
       path: path,
       metadata: metadata,
       rank: rank,
@@ -122,7 +117,7 @@ sealed class BasePathDataValue {
   }
 
   factory BasePathDataValue.ending({required String rank}) =>
-      EndingSectionPathDataValue(status: DataStatus.ending, rank: rank);
+      EndingSectionPathDataValue(status: DataStatus.empty, rank: rank);
 }
 
 class BasePathDataValueFilter {
@@ -130,7 +125,6 @@ class BasePathDataValueFilter {
     return switch (value) {
       UnknownPathDataValue() => false,
       PathDataValue(path: var valuePath) => valuePath == searchPath,
-      TemplatePathDataValue(path: var valuePath) => valuePath == searchPath,
       SectionPathDataValue(path: var valuePath) => valuePath == searchPath,
       EndingSectionPathDataValue() => false,
     };
@@ -140,7 +134,6 @@ class BasePathDataValueFilter {
     return switch (value) {
       UnknownPathDataValue() => false,
       PathDataValue(rank: var valueRank) => valueRank == searchRank,
-      TemplatePathDataValue(rank: var valueRank) => valueRank == searchRank,
       SectionPathDataValue(rank: var valueRank) => valueRank == searchRank,
       EndingSectionPathDataValue(rank: var valueRank) => valueRank == searchRank
     };
@@ -150,8 +143,6 @@ class BasePathDataValueFilter {
     return switch (value) {
       UnknownPathDataValue() => false,
       PathDataValue(status: var valueStatus) => valueStatus == searchStatus,
-      TemplatePathDataValue(status: var valueStatus) =>
-        valueStatus == searchStatus,
       SectionPathDataValue(status: var valueStatus) =>
         valueStatus == searchStatus,
       EndingSectionPathDataValue(status: var valueStatus) =>
@@ -159,16 +150,29 @@ class BasePathDataValueFilter {
     };
   }
 
+  static bool hasCategory(
+      BasePathDataValue value, DataCategory searchCategory) {
+    return switch (value) {
+      UnknownPathDataValue() => false,
+      PathDataValue(category: var valueCategory) =>
+        valueCategory == searchCategory,
+      SectionPathDataValue() => searchCategory == DataCategory.starting,
+      EndingSectionPathDataValue() => searchCategory == DataCategory.ending,
+    };
+  }
+
   static bool hasNotStatus(BasePathDataValue value, DataStatus searchStatus) =>
       !hasStatus(value, searchStatus);
+
+  static bool hasNotCategory(
+          BasePathDataValue value, DataCategory searchCategory) =>
+      !hasCategory(value, searchCategory);
 
   static bool hasAnyStatus(
       BasePathDataValue value, List<DataStatus> searchStatusList) {
     return switch (value) {
       UnknownPathDataValue() => false,
       PathDataValue(status: var valueStatus) =>
-        searchStatusList.contains(valueStatus),
-      TemplatePathDataValue(status: var valueStatus) =>
         searchStatusList.contains(valueStatus),
       SectionPathDataValue(status: var valueStatus) =>
         searchStatusList.contains(valueStatus),
@@ -183,18 +187,16 @@ class PathDataValue extends BasePathDataValue {
   PathDataMetadata metadata;
   @override
   String rank;
-  String? draft;
-  String? loaded;
-  String? refreshed;
+  DataCategory category;
+  String? text;
 
   PathDataValue({
     required super.status,
     required this.path,
     required this.metadata,
     required this.rank,
-    this.draft,
-    this.loaded,
-    this.refreshed,
+    required this.category,
+    this.text,
   });
 
   @override
@@ -205,51 +207,20 @@ class PathDataValue extends BasePathDataValue {
           path == other.path &&
           metadata == other.metadata &&
           rank == other.rank &&
-          draft == other.draft &&
-          loaded == other.loaded &&
-          refreshed == other.refreshed;
+          category == other.category &&
+          text == other.text;
 
   @override
   int get hashCode =>
       path.hashCode ^
       metadata.hashCode ^
       rank.hashCode ^
-      draft.hashCode ^
-      loaded.hashCode ^
-      refreshed.hashCode;
+      category.hashCode ^
+      text.hashCode;
 
   @override
   String toString() {
-    return 'PathDataValue{path: $path, metadata: $metadata, rank: $rank, draft: $draft, loaded: $loaded, refreshed: $refreshed}';
-  }
-}
-
-class TemplatePathDataValue extends BasePathDataValue {
-  String path;
-  PathDataMetadata metadata;
-  @override
-  String rank;
-  TemplatePathDataValue(
-      {required super.status,
-      required this.path,
-      required this.metadata,
-      required this.rank});
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is TemplatePathDataValue &&
-          runtimeType == other.runtimeType &&
-          path == other.path &&
-          metadata == other.metadata &&
-          rank == other.rank;
-
-  @override
-  int get hashCode => path.hashCode ^ metadata.hashCode ^ rank.hashCode;
-
-  @override
-  String toString() {
-    return 'TemplatePathDataValue{path: $path, metadata: $metadata, rank: $rank}';
+    return 'PathDataValue{path: $path, metadata: $metadata, rank: $rank, category: $category, text: $text}';
   }
 }
 
@@ -463,8 +434,8 @@ class SuricattaDataNavigator {
 
   static List<String> toActiveRankList(List<BasePathDataValue> valueList) =>
       toRankList(valueList
-          .where((value) =>
-              BasePathDataValueFilter.hasNotStatus(value, DataStatus.template))
+          .where((value) => BasePathDataValueFilter.hasNotCategory(
+              value, DataCategory.template))
           .toList());
 }
 
