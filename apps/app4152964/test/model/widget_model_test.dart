@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:app4152964/model/widget_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -22,7 +24,7 @@ final contactName = BasePathDataValue.some(
         widgetKind: WidgetKind.text,
         validator: (value) => []),
     rank: '001:001',
-    draft: 'draft contact name');
+    text: 'draft contact name');
 final contactCityTemplate = BasePathDataValue.template(
   path: 'contact/city',
   metadata: PathDataMetadata(
@@ -39,7 +41,7 @@ final contactCity = BasePathDataValue.some(
         widgetKind: WidgetKind.text,
         validator: (value) => []),
     rank: '001:002',
-    draft: 'draft contact city');
+    text: 'draft contact city');
 final contactEmailTemplate = BasePathDataValue.template(
   path: 'contact/email',
   metadata: PathDataMetadata(
@@ -56,7 +58,7 @@ final contactEmail = BasePathDataValue.some(
         widgetKind: WidgetKind.text,
         validator: (value) => []),
     rank: '001:003',
-    draft: 'draft contact email');
+    text: 'draft contact email');
 final contactCountryTemplate = BasePathDataValue.template(
   path: 'contact/country',
   metadata: PathDataMetadata(
@@ -111,6 +113,13 @@ void main() {
       final navigator = SuricattaDataNavigator();
       final actual = navigator.findDataByPath('');
       expect(actual, BasePathDataValue.unknown());
+    });
+
+    test('count returns the number of records', () {
+      final navigator = refNavigator;
+      expect(navigator.count(), 2);
+      expect(navigator.countByCategory(DataCategory.starting), 1);
+      expect(navigator.countByCategory(DataCategory.template), 1);
     });
 
     test('findDataByPath returns populated record', () {

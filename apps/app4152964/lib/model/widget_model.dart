@@ -328,23 +328,29 @@ class SuricattaDataNavigator {
     pathDataValueList.add(ending);
   }
 
-  BasePathDataValue findDataByPath(String path) {
+  BasePathDataValue findDataByPath(String path,
+      [DataCategory category = DataCategory.draft]) {
     return pathDataValueList.firstWhere(
-      (item) => BasePathDataValueFilter.hasPath(item, path),
+      (item) =>
+          BasePathDataValueFilter.hasPath(item, path) &&
+          BasePathDataValueFilter.hasCategory(item, category),
       orElse: () => BasePathDataValue.unknown(),
     );
   }
 
-  BasePathDataValue findDataByRank(String rank) {
+  BasePathDataValue findDataByRank(String rank,
+      [DataCategory category = DataCategory.draft]) {
     return pathDataValueList.firstWhere(
-      (item) => BasePathDataValueFilter.hasRank(item, rank),
+      (item) =>
+          BasePathDataValueFilter.hasRank(item, rank) &&
+          BasePathDataValueFilter.hasCategory(item, category),
       orElse: () => BasePathDataValue.unknown(),
     );
   }
 
   BasePathDataValue getCurrent() {
     if (currentRank is String) {
-      return findDataByRank(currentRank ?? '');
+      return findDataByRank(currentRank ?? '', DataCategory.draft);
     } else {
       return BasePathDataValue.unknown();
     }
@@ -352,7 +358,7 @@ class SuricattaDataNavigator {
 
   PathDataValue getCurrentValue() {
     if (currentRank is String) {
-      final maybeValue = findDataByRank(currentRank ?? '');
+      final maybeValue = findDataByRank(currentRank ?? '', DataCategory.draft);
       if (maybeValue is PathDataValue) {
         return maybeValue;
       }
@@ -424,6 +430,12 @@ class SuricattaDataNavigator {
     }
     return this;
   }
+
+  count() => pathDataValueList.length;
+
+  countByCategory(DataCategory category) => pathDataValueList
+      .where((item) => BasePathDataValueFilter.hasCategory(item, category))
+      .length;
 
   static List<String> toRankList(List<BasePathDataValue> valueList) => valueList
       .whereType<PathDataValue>()
