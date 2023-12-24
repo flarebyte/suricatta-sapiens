@@ -5,7 +5,6 @@ enum Level { error, warning, info }
 enum Category { syntax, spelling, server }
 
 enum DataStatus {
-  empty,
   populated,
   warning,
   error,
@@ -26,12 +25,21 @@ class Message {
   Message(this.message, this.level, this.category);
 }
 
+class PathDataError implements Exception {
+  final String message;
+  PathDataError(this.message);
+}
+
 class PathDataMetadata {
   String title;
   WidgetKind widgetKind;
+  bool optional;
   List<Message> Function(String?) validator;
   PathDataMetadata(
-      {required this.title, required this.widgetKind, required this.validator});
+      {required this.title,
+      required this.widgetKind,
+      required this.validator,
+      this.optional = false});
   factory PathDataMetadata.unknown() {
     return PathDataMetadata(
       title: '',
@@ -64,20 +72,15 @@ sealed class BasePathDataValue {
         SectionPathDataValue(rank: var valueRank) => valueRank
       };
 
+  String? get text => switch (this) {
+        UnknownPathDataValue() => null,
+        EndingSectionPathDataValue() => null,
+        PathDataValue(text: var valueText) => valueText,
+        SectionPathDataValue() => null
+      };
+
   factory BasePathDataValue.unknown() => UnknownPathDataValue();
 
-  factory BasePathDataValue.empty(
-      {required String path,
-      required PathDataMetadata metadata,
-      required String rank}) {
-    return PathDataValue(
-        path: path,
-        metadata: metadata,
-        rank: rank,
-        status: DataStatus.empty,
-        category: DataCategory.draft,
-        text: '');
-  }
   factory BasePathDataValue.some(
       {required DataStatus status,
       required String path,
@@ -96,7 +99,7 @@ sealed class BasePathDataValue {
   factory BasePathDataValue.template(
       {required String path, required metadata, required String rank}) {
     return PathDataValue(
-      status: DataStatus.empty,
+      status: DataStatus.todo,
       path: path,
       metadata: metadata,
       rank: rank,
@@ -109,7 +112,7 @@ sealed class BasePathDataValue {
     required String rank,
   }) {
     return SectionPathDataValue(
-      status: DataStatus.empty,
+      status: DataStatus.todo,
       path: path,
       metadata: metadata,
       rank: rank,
@@ -117,7 +120,7 @@ sealed class BasePathDataValue {
   }
 
   factory BasePathDataValue.ending({required String rank}) =>
-      EndingSectionPathDataValue(status: DataStatus.empty, rank: rank);
+      EndingSectionPathDataValue(status: DataStatus.todo, rank: rank);
 }
 
 class BasePathDataValueFilter {
@@ -188,6 +191,7 @@ class PathDataValue extends BasePathDataValue {
   @override
   String rank;
   DataCategory category;
+  @override
   String? text;
 
   PathDataValue({
@@ -221,6 +225,25 @@ class PathDataValue extends BasePathDataValue {
   @override
   String toString() {
     return 'PathDataValue{path: $path, metadata: $metadata, rank: $rank, category: $category, text: $text}';
+  }
+
+  setTextAsString(String newText) {
+    final isSupported = metadata.widgetKind == WidgetKind.text;
+    if (!isSupported) {
+      throw PathDataError('Not supported for ${metadata.widgetKind}');
+    }
+    text = newText;
+    _status = DataStatus.populated;
+  }
+
+  factory PathDataValue.todo(PathDataValue template) {
+    return PathDataValue(
+        path: template.path,
+        metadata: template.metadata,
+        rank: template.rank,
+        category: DataCategory.draft,
+        text: template.text,
+        status: DataStatus.todo);
   }
 }
 
@@ -322,7 +345,7 @@ class SuricattaDataNavigator {
     pathDataValueList.add(start);
   }
 
-  addEnding(String path, SectionPathDataMetadata metadata) {
+  addEnding() {
     final ending = BasePathDataValue.ending(
         rank: hierarchicalIdentifierBuilder.addChild().idAsString());
     pathDataValueList.add(ending);
@@ -436,6 +459,36 @@ class SuricattaDataNavigator {
   countByCategory(DataCategory category) => pathDataValueList
       .where((item) => BasePathDataValueFilter.hasCategory(item, category))
       .length;
+
+  createRootTodos() {
+    final todoTemplates = pathDataValueList.whereType<PathDataValue>().where(
+        (item) =>
+            BasePathDataValueFilter.hasCategory(item, DataCategory.template));
+    final todos = todoTemplates.map((item) => PathDataValue.todo(item));
+    pathDataValueList.addAll(todos);
+  }
+
+  setTextAsStringByRank(String newText,
+      {required String rank, DataCategory category = DataCategory.draft}) {
+    pathDataValueList
+        .whereType<PathDataValue>()
+        .where((item) =>
+            BasePathDataValueFilter.hasRank(item, rank) &&
+            BasePathDataValueFilter.hasCategory(item, DataCategory.template))
+        .map((item) => item.setTextAsString(newText))
+        .length;
+  }
+
+  setTextAsStringByPath(String newText,
+      {required String path, DataCategory category = DataCategory.draft}) {
+    pathDataValueList
+        .whereType<PathDataValue>()
+        .where((item) =>
+            BasePathDataValueFilter.hasPath(item, path) &&
+            BasePathDataValueFilter.hasCategory(item, DataCategory.template))
+        .map((item) => item.setTextAsString(newText))
+        .length;
+  }
 
   static List<String> toRankList(List<BasePathDataValue> valueList) => valueList
       .whereType<PathDataValue>()

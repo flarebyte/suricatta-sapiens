@@ -1,105 +1,24 @@
-import 'dart:math';
-
 import 'package:app4152964/model/widget_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-final contactSectionStart = BasePathDataValue.start(
-  path: 'contact',
-  metadata: SectionPathDataMetadata(title: 'Contact name'),
-  rank: '001:--',
-);
-final contactSectionEnd = BasePathDataValue.ending(rank: '001:>>');
-final contactNameTemplate = BasePathDataValue.template(
-    path: 'contact/name',
-    metadata: PathDataMetadata(
-        title: 'Contact name',
-        widgetKind: WidgetKind.text,
-        validator: (value) => []),
-    rank: '001:001');
-final contactName = BasePathDataValue.some(
-    status: DataStatus.populated,
-    path: 'contact/name',
-    metadata: PathDataMetadata(
-        title: 'Contact name',
-        widgetKind: WidgetKind.text,
-        validator: (value) => []),
-    rank: '001:001',
-    text: 'draft contact name');
-final contactCityTemplate = BasePathDataValue.template(
-  path: 'contact/city',
-  metadata: PathDataMetadata(
-      title: 'Contact city',
-      widgetKind: WidgetKind.text,
-      validator: (value) => []),
-  rank: '001:002',
-);
-final contactCity = BasePathDataValue.some(
-    status: DataStatus.populated,
-    path: 'contact/city',
-    metadata: PathDataMetadata(
-        title: 'Contact city',
-        widgetKind: WidgetKind.text,
-        validator: (value) => []),
-    rank: '001:002',
-    text: 'draft contact city');
-final contactEmailTemplate = BasePathDataValue.template(
-  path: 'contact/email',
-  metadata: PathDataMetadata(
-      title: 'Contact city',
-      widgetKind: WidgetKind.text,
-      validator: (value) => []),
-  rank: '001:003',
-);
-final contactEmail = BasePathDataValue.some(
-    status: DataStatus.error,
-    path: 'contact/email',
-    metadata: PathDataMetadata(
-        title: 'Contact city',
-        widgetKind: WidgetKind.text,
-        validator: (value) => []),
-    rank: '001:003',
-    text: 'draft contact email');
-final contactCountryTemplate = BasePathDataValue.template(
-  path: 'contact/country',
-  metadata: PathDataMetadata(
-      title: 'Contact country',
-      widgetKind: WidgetKind.text,
-      validator: (value) => []),
-  rank: '001:004',
-);
-
-final contactRegionTemplate = BasePathDataValue.template(
-  path: 'contact/region',
-  metadata: PathDataMetadata(
-      title: 'Contact region',
-      widgetKind: WidgetKind.text,
-      validator: (value) => []),
-  rank: '001:005',
-);
-final contactCountry = BasePathDataValue.empty(
-  path: 'contact/country',
-  metadata: PathDataMetadata(
-      title: 'Contact country',
-      widgetKind: WidgetKind.text,
-      validator: (value) => []),
-  rank: '001:004',
-);
-
-final simpleDataList = [
-  contactCity,
-  contactEmail,
-  contactName,
-  contactCountry,
-  contactSectionEnd,
-  contactSectionStart,
-  contactNameTemplate,
-  contactCityTemplate,
-  contactEmailTemplate,
-  contactCountryTemplate,
-  contactRegionTemplate
-];
 final contactNameMeta = PathDataMetadata(
     title: 'Contact name',
+    widgetKind: WidgetKind.text,
+    validator: (value) => []);
+final contactCityMeta = PathDataMetadata(
+    title: 'Contact city',
+    widgetKind: WidgetKind.text,
+    validator: (value) => []);
+final contactCountryMeta = PathDataMetadata(
+    title: 'Contact country',
+    widgetKind: WidgetKind.text,
+    validator: (value) => []);
+final contactRegionMeta = PathDataMetadata(
+    title: 'Contact region',
+    widgetKind: WidgetKind.text,
+    validator: (value) => []);
+final contactEmailMeta = PathDataMetadata(
+    title: 'Contact email',
     widgetKind: WidgetKind.text,
     validator: (value) => []);
 
@@ -109,6 +28,32 @@ void main() {
     refNavigator.setRoot();
     refNavigator.addStart('contact', SectionPathDataMetadata(title: 'Contact'));
     refNavigator.addTemplate('contact/name', contactNameMeta);
+    refNavigator.addTemplate('contact/city', contactCityMeta);
+    refNavigator.addTemplate('contact/country', contactCountryMeta);
+    refNavigator.addTemplate('contact/region', contactRegionMeta);
+    refNavigator.addTemplate('contact/email', contactEmailMeta);
+    refNavigator.addEnding();
+    refNavigator.createRootTodos();
+    expect(
+        refNavigator.setTextAsStringByPath('draft contact name',
+            path: 'contact/name'),
+        1);
+    expect(
+        refNavigator.setTextAsStringByPath('draft contact city',
+            path: 'contact/city'),
+        1);
+    expect(
+        refNavigator.setTextAsStringByPath('draft contact region',
+            path: 'contact/region'),
+        1);
+    expect(
+        refNavigator.setTextAsStringByPath('draft contact email',
+            path: 'contact/email'),
+        1);
+    expect(
+        refNavigator.setTextAsStringByPath('draft contact country',
+            path: 'contact/country'),
+        1);
     test('findDataByPath returns unknown for empty data', () {
       final navigator = SuricattaDataNavigator();
       final actual = navigator.findDataByPath('');
@@ -117,25 +62,23 @@ void main() {
 
     test('count returns the number of records', () {
       final navigator = refNavigator;
-      expect(navigator.count(), 2);
+      expect(navigator.count(), 12);
       expect(navigator.countByCategory(DataCategory.starting), 1);
-      expect(navigator.countByCategory(DataCategory.template), 1);
+      expect(navigator.countByCategory(DataCategory.starting), 2);
+      expect(navigator.countByCategory(DataCategory.template), 5);
+      expect(navigator.countByCategory(DataCategory.draft), 5);
     });
 
     test('findDataByPath returns populated record', () {
       final navigator = refNavigator;
       final actual = navigator.findDataByPath('contact/name');
-      expect(actual, contactName);
-    });
-    test('findDataByPath returns empty record', () {
-      final navigator = refNavigator;
-      final actual = navigator.findDataByPath('contact/country');
-      expect(actual, contactCountry);
+      expect(actual.text, 'draft contact name');
+      expect(actual.status, DataStatus.populated);
     });
     test('findDataByPath returns error record', () {
       final navigator = refNavigator;
       final actual = navigator.findDataByPath('contact/email');
-      expect(actual, contactEmail);
+      expect(actual.status, DataStatus.error);
     });
     test('findDataByRank returns unknown for empty data', () {
       final navigator = refNavigator;
@@ -146,24 +89,20 @@ void main() {
     test('findDataByRank returns populated record', () {
       final navigator = refNavigator;
       final actual = navigator.findDataByRank('001:001');
-      expect(actual, contactName);
-    });
-
-    test('toRankList returns a list of rank in alphabetical order', () {
-      final actual = SuricattaDataNavigator.toRankList(simpleDataList);
-      expect(actual, ['001:001', '001:002', '001:003', '001:004', '001:005']);
+      expect(actual.text, 'draft contact name');
+      expect(actual.status, DataStatus.populated);
     });
 
     test('first returns first record', () {
       final navigator = refNavigator;
       final actualRank = navigator.first().move().getCurrent();
-      expect(actualRank, contactName);
+      expect(actualRank.path, 'contact/name');
     });
 
     test('last returns last record', () {
       final navigator = refNavigator;
       final actual = navigator.last().move().getCurrent();
-      expect(actual, contactCountry);
+      expect(actual.path, 'contact/country');
     });
 
     test('next returns next record', () {
@@ -187,10 +126,11 @@ void main() {
     test('firstWhere returns matching a criteria', () {
       final navigator = refNavigator;
       final actual = navigator
-          .firstWhere((v) => BasePathDataValueFilter.hasRank(v, '001:003'))
+          .firstWhere(
+              (v) => BasePathDataValueFilter.hasPath(v, 'contact/email'))
           .move()
           .getCurrent();
-      expect(actual, contactEmail);
+      expect(actual.path, 'contact/email');
     });
 
     test('firstWhere should deal gracefully with no result', () {
@@ -207,7 +147,7 @@ void main() {
               (v) => BasePathDataValueFilter.hasStatus(v, DataStatus.error))
           .move()
           .getCurrent();
-      expect(actual, contactEmail);
+      expect(actual.path, 'contact/email');
     });
 
     test('nextWhere returns matching a criteria after first', () {
@@ -219,10 +159,16 @@ void main() {
               (v) => BasePathDataValueFilter.hasStatus(v, DataStatus.populated))
           .move()
           .getCurrent();
-      expect(actual, contactCity);
+      expect(actual.path, 'contact/city');
     });
   });
   group('BasePathDataValueFilter', () {
+    final contactName = PathDataValue(
+        status: DataStatus.populated,
+        path: 'contact/name',
+        metadata: contactNameMeta,
+        rank: '001:001',
+        category: DataCategory.draft);
     test('hasPath should match if same path', () {
       expect(
           BasePathDataValueFilter.hasPath(contactName, 'contact/name'), true);
@@ -248,21 +194,21 @@ void main() {
     });
 
     test('hasStatus should not match if status are different', () {
-      expect(BasePathDataValueFilter.hasStatus(contactName, DataStatus.empty),
+      expect(BasePathDataValueFilter.hasStatus(contactName, DataStatus.error),
           false);
     });
 
     test('hasAnyStatus should match if any status matching', () {
       expect(
           BasePathDataValueFilter.hasAnyStatus(
-              contactName, [DataStatus.empty, DataStatus.populated]),
+              contactName, [DataStatus.todo, DataStatus.populated]),
           true);
     });
 
     test('hasAnyStatus should not match if no status matching', () {
       expect(
           BasePathDataValueFilter.hasAnyStatus(
-              contactName, [DataStatus.empty, DataStatus.skipped]),
+              contactName, [DataStatus.todo, DataStatus.skipped]),
           false);
     });
   });
