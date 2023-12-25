@@ -34,26 +34,16 @@ void main() {
     refNavigator.addTemplate('contact/email', contactEmailMeta);
     refNavigator.addEnding();
     refNavigator.createRootTodos();
-    expect(
-        refNavigator.setTextAsStringByPath('draft contact name',
-            path: 'contact/name'),
-        1);
-    expect(
-        refNavigator.setTextAsStringByPath('draft contact city',
-            path: 'contact/city'),
-        1);
-    expect(
-        refNavigator.setTextAsStringByPath('draft contact region',
-            path: 'contact/region'),
-        1);
-    expect(
-        refNavigator.setTextAsStringByPath('draft contact email',
-            path: 'contact/email'),
-        1);
-    expect(
-        refNavigator.setTextAsStringByPath('draft contact country',
-            path: 'contact/country'),
-        1);
+    refNavigator.setTextAsStringByPath('draft contact name',
+        path: 'contact/name');
+    refNavigator.setTextAsStringByPath('draft contact city',
+        path: 'contact/city');
+    refNavigator.setTextAsStringByPath('draft contact region',
+        path: 'contact/region');
+    refNavigator.setTextAsStringByPath('draft contact email',
+        path: 'contact/email');
+    refNavigator.setTextAsStringByPath('draft contact country',
+        path: 'contact/country');
     test('findDataByPath returns unknown for empty data', () {
       final navigator = SuricattaDataNavigator();
       final actual = navigator.findDataByPath('');

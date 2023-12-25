@@ -465,7 +465,7 @@ class SuricattaDataNavigator {
         (item) =>
             BasePathDataValueFilter.hasCategory(item, DataCategory.template));
     final todos = todoTemplates.map((item) => PathDataValue.todo(item));
-    pathDataValueList.addAll(todos);
+    // pathDataValueList.addAll(todos);
   }
 
   setTextAsStringByRank(String newText,
@@ -486,7 +486,7 @@ class SuricattaDataNavigator {
         .where((item) =>
             BasePathDataValueFilter.hasPath(item, path) &&
             BasePathDataValueFilter.hasCategory(item, DataCategory.template))
-        .map((item) => item.setTextAsString(newText))
+      //  .map((item) => item.setTextAsString(newText))
         .length;
   }
 

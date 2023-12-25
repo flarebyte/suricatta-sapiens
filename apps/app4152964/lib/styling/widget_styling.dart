@@ -36,8 +36,6 @@ IconData getNavigationPathStatusIcon(DataStatus status) {
       return Icons.error;
     case DataStatus.warning:
       return Icons.warning;
-    case DataStatus.empty:
-      return Icons.check_box_outline_blank;
     case DataStatus.skipped:
       return Icons.skip_next;
     default:
@@ -65,8 +63,6 @@ Color getNavigationPathStatusColor(DataStatus status) {
     case DataStatus.error:
       return Colors.red;
     case DataStatus.warning:
-      return Colors.orange;
-    case DataStatus.empty:
       return Colors.orange;
     case DataStatus.skipped:
       return Colors.grey;
