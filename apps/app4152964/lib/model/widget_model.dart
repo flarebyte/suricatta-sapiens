@@ -356,7 +356,7 @@ class SuricattaDataNavigatorException implements Exception {
 }
 
 class SuricattaDataNavigator {
-  BasePathDataValueCollection pathDataValueList = BasePathDataValueCollection();
+  BasePathDataValueCollection dataValueCollection = BasePathDataValueCollection();
   HierarchicalIdentifierBuilder hierarchicalIdentifierBuilder =
       HierarchicalIdentifierBuilder();
   String? currentRank;
@@ -372,7 +372,7 @@ class SuricattaDataNavigator {
         path: path,
         metadata: metadata,
         rank: hierarchicalIdentifierBuilder.addChild().idAsString());
-    pathDataValueList.add(template);
+    dataValueCollection.add(template);
   }
 
   addStart(String path, SectionPathDataMetadata metadata) {
@@ -380,18 +380,18 @@ class SuricattaDataNavigator {
         path: path,
         metadata: metadata,
         rank: hierarchicalIdentifierBuilder.addChild().idAsString());
-    pathDataValueList.add(start);
+    dataValueCollection.add(start);
   }
 
   addEnding() {
     final ending = BasePathDataValue.ending(
         rank: hierarchicalIdentifierBuilder.addChild().idAsString());
-    pathDataValueList.add(ending);
+    dataValueCollection.add(ending);
   }
 
   BasePathDataValue findDataByPath(String path,
       [DataCategory category = DataCategory.draft]) {
-    return pathDataValueList.firstWhere(
+    return dataValueCollection.firstWhere(
       (item) =>
           BasePathDataValueFilter.hasPath(item, path) &&
           BasePathDataValueFilter.hasCategory(item, category),
@@ -400,7 +400,7 @@ class SuricattaDataNavigator {
 
   BasePathDataValue findDataByRank(String rank,
       [DataCategory category = DataCategory.draft]) {
-    return pathDataValueList.firstWhere(
+    return dataValueCollection.firstWhere(
       (item) =>
           BasePathDataValueFilter.hasRank(item, rank) &&
           BasePathDataValueFilter.hasCategory(item, category),
@@ -429,25 +429,25 @@ class SuricattaDataNavigator {
   bool hasCurrent() => (currentRank is String);
 
   first() {
-    final firstRank = pathDataValueList.toActiveRankList().firstOrNull;
+    final firstRank = dataValueCollection.toActiveRankList().firstOrNull;
     possibleRank = firstRank;
     return this;
   }
 
   firstWhere(bool Function(BasePathDataValue) where) {
-    final matched = pathDataValueList.firstWhere(where);
+    final matched = dataValueCollection.firstWhere(where);
     possibleRank = matched.rank;
     return this;
   }
 
   last() {
-    final lastRank = pathDataValueList.toActiveRankList().lastOrNull;
+    final lastRank = dataValueCollection.toActiveRankList().lastOrNull;
     possibleRank = lastRank;
     return this;
   }
 
   next() {
-    final ranks = pathDataValueList.toActiveRankList();
+    final ranks = dataValueCollection.toActiveRankList();
     final indexCurrent = ranks.indexOf(currentRank ?? '');
     if (indexCurrent >= 0 && indexCurrent < ranks.length - 1) {
       possibleRank = ranks[indexCurrent + 1];
@@ -458,9 +458,9 @@ class SuricattaDataNavigator {
   }
 
   nextWhere(bool Function(BasePathDataValue) where) {
-    final ranks = pathDataValueList.toRankList();
+    final ranks = dataValueCollection.toRankList();
     final indexCurrent = ranks.indexOf(currentRank ?? '');
-    final matched = pathDataValueList.firstWhere((value) {
+    final matched = dataValueCollection.firstWhere((value) {
       final matchingRank = ranks.indexOf(value.rank);
       return (indexCurrent == -1 || matchingRank > indexCurrent) &&
           where(value);
@@ -470,7 +470,7 @@ class SuricattaDataNavigator {
   }
 
   previous() {
-    final ranks = pathDataValueList.toActiveRankList();
+    final ranks = dataValueCollection.toActiveRankList();
     final indexCurrent = ranks.indexOf(currentRank ?? '');
     if (indexCurrent > 0) {
       possibleRank = ranks[indexCurrent - 1];
@@ -489,14 +489,14 @@ class SuricattaDataNavigator {
     return this;
   }
 
-  count() => pathDataValueList.count();
+  count() => dataValueCollection.count();
 
   countByCategory(DataCategory category) =>
-      pathDataValueList.countByCategory(category);
+      dataValueCollection.countByCategory(category);
 
   createRootTodos() {
     final todoTemplates =
-        pathDataValueList.findAllByCategory(DataCategory.template);
+        dataValueCollection.findAllByCategory(DataCategory.template);
     List<BasePathDataValue> newPathDataValueList = [];
     for (PathDataValue template in todoTemplates) {
       final todo = PathDataValue.todo(template);
@@ -507,7 +507,7 @@ class SuricattaDataNavigator {
 
   setTextAsStringByRank(String newText,
       {required String rank, DataCategory category = DataCategory.draft}) {
-    final previous = pathDataValueList.findByRank(rank, category);
+    final previous = dataValueCollection.findByRank(rank, category);
     if (previous is PathDataValue) {
       previous.setTextAsString(newText);
     } else {
@@ -518,7 +518,7 @@ class SuricattaDataNavigator {
 
   setTextAsStringByPath(String newText,
       {required String path, DataCategory category = DataCategory.draft}) {
-    final previous = pathDataValueList.findDataByPath(path, category);
+    final previous = dataValueCollection.findDataByPath(path, category);
     if (previous is PathDataValue) {
       previous.setTextAsString(newText);
     } else {
