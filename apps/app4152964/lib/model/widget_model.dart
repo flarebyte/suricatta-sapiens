@@ -1,5 +1,4 @@
 import 'dart:collection';
-import 'dart:js_util';
 
 import 'hierarchical_identifier.dart';
 
@@ -68,15 +67,13 @@ sealed class BasePathDataValue {
 
   DataStatus get status => _status;
 
-  String? get rank => switch (this) {
-        UnknownPathDataValue() => null,
+  String get rank => switch (this) {
         EndingSectionPathDataValue(rank: var valueRank) => valueRank,
         PathDataValue(rank: var valueRank) => valueRank,
         SectionPathDataValue(rank: var valueRank) => valueRank
       };
 
   String get composedRank => switch (this) {
-        UnknownPathDataValue() => 'unknown',
         EndingSectionPathDataValue(rank: var valueRank) => 'end-$valueRank',
         PathDataValue(rank: var valueRank, category: var valueCategory) =>
           '$valueCategory-$valueRank',
@@ -84,13 +81,10 @@ sealed class BasePathDataValue {
       };
 
   String? get text => switch (this) {
-        UnknownPathDataValue() => null,
         EndingSectionPathDataValue() => null,
         PathDataValue(text: var valueText) => valueText,
         SectionPathDataValue() => null
       };
-
-  factory BasePathDataValue.unknown() => UnknownPathDataValue();
 
   factory BasePathDataValue.some(
       {required DataStatus status,
@@ -137,7 +131,6 @@ sealed class BasePathDataValue {
 class BasePathDataValueFilter {
   static bool hasPath(BasePathDataValue value, String searchPath) {
     return switch (value) {
-      UnknownPathDataValue() => false,
       PathDataValue(path: var valuePath) => valuePath == searchPath,
       SectionPathDataValue(path: var valuePath) => valuePath == searchPath,
       EndingSectionPathDataValue() => false,
@@ -146,7 +139,6 @@ class BasePathDataValueFilter {
 
   static bool hasRank(BasePathDataValue value, String searchRank) {
     return switch (value) {
-      UnknownPathDataValue() => false,
       PathDataValue(rank: var valueRank) => valueRank == searchRank,
       SectionPathDataValue(rank: var valueRank) => valueRank == searchRank,
       EndingSectionPathDataValue(rank: var valueRank) => valueRank == searchRank
@@ -155,7 +147,6 @@ class BasePathDataValueFilter {
 
   static bool hasStatus(BasePathDataValue value, DataStatus searchStatus) {
     return switch (value) {
-      UnknownPathDataValue() => false,
       PathDataValue(status: var valueStatus) => valueStatus == searchStatus,
       SectionPathDataValue(status: var valueStatus) =>
         valueStatus == searchStatus,
@@ -167,7 +158,6 @@ class BasePathDataValueFilter {
   static bool hasCategory(
       BasePathDataValue value, DataCategory searchCategory) {
     return switch (value) {
-      UnknownPathDataValue() => false,
       PathDataValue(category: var valueCategory) =>
         valueCategory == searchCategory,
       SectionPathDataValue() => searchCategory == DataCategory.starting,
@@ -185,7 +175,6 @@ class BasePathDataValueFilter {
   static bool hasAnyStatus(
       BasePathDataValue value, List<DataStatus> searchStatusList) {
     return switch (value) {
-      UnknownPathDataValue() => false,
       PathDataValue(status: var valueStatus) =>
         searchStatusList.contains(valueStatus),
       SectionPathDataValue(status: var valueStatus) =>
@@ -258,18 +247,6 @@ class PathDataValue extends BasePathDataValue {
   }
 }
 
-class UnknownPathDataValue extends BasePathDataValue {
-  UnknownPathDataValue() : super(status: DataStatus.unknown);
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is UnknownPathDataValue && runtimeType == other.runtimeType;
-
-  @override
-  int get hashCode => 0;
-}
-
 class SectionPathDataValue extends BasePathDataValue {
   String path;
   SectionPathDataMetadata metadata;
@@ -325,9 +302,6 @@ class BasePathDataValueCollection {
   SplayTreeMap<String, BasePathDataValue> pathDataValueMap =
       SplayTreeMap<String, BasePathDataValue>((a, b) => a.compareTo(b));
   add(BasePathDataValue added) {
-    if (typeofEquals(added, 'UnknownPathDataValue')) {
-      return;
-    }
     pathDataValueMap.update(added.composedRank, (v) => added);
   }
 
@@ -357,7 +331,6 @@ class BasePathDataValueCollection {
       (item) =>
           BasePathDataValueFilter.hasPath(item, path) &&
           BasePathDataValueFilter.hasCategory(item, category),
-      orElse: () => BasePathDataValue.unknown(),
     );
   }
 
@@ -368,7 +341,7 @@ class BasePathDataValueCollection {
       .length;
 
   firstWhere(bool Function(BasePathDataValue) where) => pathDataValueMap.values
-      .firstWhere(where, orElse: () => BasePathDataValue.unknown());
+      .firstWhere(where);
 
   Iterable<PathDataValue> findAllByCategory(DataCategory category) =>
       pathDataValueMap.values.whereType<PathDataValue>().where((item) =>
@@ -439,7 +412,7 @@ class SuricattaDataNavigator {
     if (currentRank is String) {
       return findDataByRank(currentRank ?? '', DataCategory.draft);
     } else {
-      return BasePathDataValue.unknown();
+      throw SuricattaDataNavigatorException('There is no current element');
     }
   }
 
@@ -534,7 +507,6 @@ class SuricattaDataNavigator {
 
   setTextAsStringByRank(String newText,
       {required String rank, DataCategory category = DataCategory.draft}) {
-    PathDataValue newData = PathDataValue()
     pathDataValueList
         .whereType<PathDataValue>()
         .where((item) =>
