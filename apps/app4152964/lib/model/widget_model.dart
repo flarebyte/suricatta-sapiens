@@ -340,13 +340,12 @@ class BasePathDataValueCollection {
       .where((item) => BasePathDataValueFilter.hasCategory(item, category))
       .length;
 
-  firstWhere(bool Function(BasePathDataValue) where) => pathDataValueMap.values
-      .firstWhere(where);
+  firstWhere(bool Function(BasePathDataValue) where) =>
+      pathDataValueMap.values.firstWhere(where);
 
   Iterable<PathDataValue> findAllByCategory(DataCategory category) =>
       pathDataValueMap.values.whereType<PathDataValue>().where((item) =>
           BasePathDataValueFilter.hasCategory(item, DataCategory.template));
-
 }
 
 class SuricattaDataNavigatorException implements Exception {
@@ -462,7 +461,7 @@ class SuricattaDataNavigator {
     final ranks = pathDataValueList.toRankList();
     final indexCurrent = ranks.indexOf(currentRank ?? '');
     final matched = pathDataValueList.firstWhere((value) {
-      final matchingRank = ranks.indexOf(value.rank ?? '');
+      final matchingRank = ranks.indexOf(value.rank);
       return (indexCurrent == -1 || matchingRank > indexCurrent) &&
           where(value);
     });
@@ -496,7 +495,8 @@ class SuricattaDataNavigator {
       pathDataValueList.countByCategory(category);
 
   createRootTodos() {
-    final todoTemplates = pathDataValueList.findAllByCategory(DataCategory.template);
+    final todoTemplates =
+        pathDataValueList.findAllByCategory(DataCategory.template);
     List<BasePathDataValue> newPathDataValueList = [];
     for (PathDataValue template in todoTemplates) {
       final todo = PathDataValue.todo(template);
@@ -507,24 +507,24 @@ class SuricattaDataNavigator {
 
   setTextAsStringByRank(String newText,
       {required String rank, DataCategory category = DataCategory.draft}) {
-    pathDataValueList
-        .whereType<PathDataValue>()
-        .where((item) =>
-            BasePathDataValueFilter.hasRank(item, rank) &&
-            BasePathDataValueFilter.hasCategory(item, DataCategory.template))
-        .map((item) => item.setTextAsString(newText))
-        .length;
+    final previous = pathDataValueList.findByRank(rank, category);
+    if (previous is PathDataValue) {
+      previous.setTextAsString(newText);
+    } else {
+      throw SuricattaDataNavigatorException(
+          "No existing value for rank: $rank and category: $category");
+    }
   }
 
   setTextAsStringByPath(String newText,
       {required String path, DataCategory category = DataCategory.draft}) {
-    pathDataValueList
-        .whereType<PathDataValue>()
-        .where((item) =>
-            BasePathDataValueFilter.hasPath(item, path) &&
-            BasePathDataValueFilter.hasCategory(item, DataCategory.template))
-        //  .map((item) => item.setTextAsString(newText))
-        .length;
+    final previous = pathDataValueList.findDataByPath(path, category);
+    if (previous is PathDataValue) {
+      previous.setTextAsString(newText);
+    } else {
+      throw SuricattaDataNavigatorException(
+          "No existing value for path: $path and category: $category");
+    }
   }
 
   static List<String> toRankList(List<BasePathDataValue> valueList) => valueList
