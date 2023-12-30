@@ -2,9 +2,9 @@ import 'dart:collection';
 
 import 'hierarchical_identifier.dart';
 
-enum Level { error, warning, info }
+enum MessageLevel { error, warning, info }
 
-enum Category { syntax, spelling, server }
+enum MessageCategory { syntax, spelling, server }
 
 enum DataStatus {
   populated,
@@ -21,29 +21,29 @@ enum DataCategory { draft, loaded, refreshed, template, starting, ending }
 
 class Message {
   String message;
-  Level level;
-  Category category;
+  MessageLevel level;
+  MessageCategory category;
 
   Message(this.message, this.level, this.category);
 }
 
-class PathDataError implements Exception {
+class PathDataException implements Exception {
   final String message;
-  PathDataError(this.message);
+  PathDataException(this.message);
 }
 
-class PathDataMetadata {
+class DataMetadata {
   String title;
   WidgetKind widgetKind;
   bool optional;
   List<Message> Function(String?) validator;
-  PathDataMetadata(
+  DataMetadata(
       {required this.title,
       required this.widgetKind,
       required this.validator,
       this.optional = false});
-  factory PathDataMetadata.unknown() {
-    return PathDataMetadata(
+  factory DataMetadata.unknown() {
+    return DataMetadata(
       title: '',
       widgetKind: WidgetKind.text,
       validator: (value) => [],
@@ -51,9 +51,9 @@ class PathDataMetadata {
   }
 }
 
-class SectionPathDataMetadata {
+class SectionMetadata {
   String title;
-  SectionPathDataMetadata({required this.title});
+  SectionMetadata({required this.title});
 }
 
 class DataPreview {
@@ -61,32 +61,32 @@ class DataPreview {
   DataPreview({required this.text});
 }
 
-sealed class BasePathDataValue {
+sealed class BaseDataValue {
   DataStatus _status;
-  BasePathDataValue({required DataStatus status}) : _status = status;
+  BaseDataValue({required DataStatus status}) : _status = status;
 
   DataStatus get status => _status;
 
   String get rank => switch (this) {
-        EndingSectionPathDataValue(rank: var valueRank) => valueRank,
+        EndingSection(rank: var valueRank) => valueRank,
         PathDataValue(rank: var valueRank) => valueRank,
-        SectionPathDataValue(rank: var valueRank) => valueRank
+        StartingSection(rank: var valueRank) => valueRank
       };
 
   String get composedRank => switch (this) {
-        EndingSectionPathDataValue(rank: var valueRank) => 'end-$valueRank',
+        EndingSection(rank: var valueRank) => 'end-$valueRank',
         PathDataValue(rank: var valueRank, category: var valueCategory) =>
           '$valueCategory-$valueRank',
-        SectionPathDataValue(rank: var valueRank) => 'start-$valueRank',
+        StartingSection(rank: var valueRank) => 'start-$valueRank',
       };
 
   String? get text => switch (this) {
-        EndingSectionPathDataValue() => null,
+        EndingSection() => null,
         PathDataValue(text: var valueText) => valueText,
-        SectionPathDataValue() => null
+        StartingSection() => null
       };
 
-  factory BasePathDataValue.some(
+  factory BaseDataValue.some(
       {required DataStatus status,
       required String path,
       required metadata,
@@ -101,7 +101,7 @@ sealed class BasePathDataValue {
       text: text,
     );
   }
-  factory BasePathDataValue.template(
+  factory BaseDataValue.template(
       {required String path, required metadata, required String rank}) {
     return PathDataValue(
       status: DataStatus.todo,
@@ -111,12 +111,12 @@ sealed class BasePathDataValue {
       category: DataCategory.template,
     );
   }
-  factory BasePathDataValue.start({
+  factory BaseDataValue.start({
     required String path,
-    required SectionPathDataMetadata metadata,
+    required SectionMetadata metadata,
     required String rank,
   }) {
-    return SectionPathDataValue(
+    return StartingSection(
       status: DataStatus.todo,
       path: path,
       metadata: metadata,
@@ -124,70 +124,70 @@ sealed class BasePathDataValue {
     );
   }
 
-  factory BasePathDataValue.ending({required String rank}) =>
-      EndingSectionPathDataValue(status: DataStatus.todo, rank: rank);
+  factory BaseDataValue.ending({required String rank}) =>
+      EndingSection(status: DataStatus.todo, rank: rank);
 }
 
-class BasePathDataValueFilter {
-  static bool hasPath(BasePathDataValue value, String searchPath) {
+class DataFilter {
+  static bool hasPath(BaseDataValue value, String searchPath) {
     return switch (value) {
       PathDataValue(path: var valuePath) => valuePath == searchPath,
-      SectionPathDataValue(path: var valuePath) => valuePath == searchPath,
-      EndingSectionPathDataValue() => false,
+      StartingSection(path: var valuePath) => valuePath == searchPath,
+      EndingSection() => false,
     };
   }
 
-  static bool hasRank(BasePathDataValue value, String searchRank) {
+  static bool hasRank(BaseDataValue value, String searchRank) {
     return switch (value) {
       PathDataValue(rank: var valueRank) => valueRank == searchRank,
-      SectionPathDataValue(rank: var valueRank) => valueRank == searchRank,
-      EndingSectionPathDataValue(rank: var valueRank) => valueRank == searchRank
+      StartingSection(rank: var valueRank) => valueRank == searchRank,
+      EndingSection(rank: var valueRank) => valueRank == searchRank
     };
   }
 
-  static bool hasStatus(BasePathDataValue value, DataStatus searchStatus) {
+  static bool hasStatus(BaseDataValue value, DataStatus searchStatus) {
     return switch (value) {
       PathDataValue(status: var valueStatus) => valueStatus == searchStatus,
-      SectionPathDataValue(status: var valueStatus) =>
+      StartingSection(status: var valueStatus) =>
         valueStatus == searchStatus,
-      EndingSectionPathDataValue(status: var valueStatus) =>
+      EndingSection(status: var valueStatus) =>
         valueStatus == searchStatus,
     };
   }
 
   static bool hasCategory(
-      BasePathDataValue value, DataCategory searchCategory) {
+      BaseDataValue value, DataCategory searchCategory) {
     return switch (value) {
       PathDataValue(category: var valueCategory) =>
         valueCategory == searchCategory,
-      SectionPathDataValue() => searchCategory == DataCategory.starting,
-      EndingSectionPathDataValue() => searchCategory == DataCategory.ending,
+      StartingSection() => searchCategory == DataCategory.starting,
+      EndingSection() => searchCategory == DataCategory.ending,
     };
   }
 
-  static bool hasNotStatus(BasePathDataValue value, DataStatus searchStatus) =>
+  static bool hasNotStatus(BaseDataValue value, DataStatus searchStatus) =>
       !hasStatus(value, searchStatus);
 
   static bool hasNotCategory(
-          BasePathDataValue value, DataCategory searchCategory) =>
+          BaseDataValue value, DataCategory searchCategory) =>
       !hasCategory(value, searchCategory);
 
   static bool hasAnyStatus(
-      BasePathDataValue value, List<DataStatus> searchStatusList) {
+      BaseDataValue value, List<DataStatus> searchStatusList) {
     return switch (value) {
       PathDataValue(status: var valueStatus) =>
         searchStatusList.contains(valueStatus),
-      SectionPathDataValue(status: var valueStatus) =>
+      StartingSection(status: var valueStatus) =>
         searchStatusList.contains(valueStatus),
-      EndingSectionPathDataValue(status: var valueStatus) =>
+      EndingSection(status: var valueStatus) =>
         searchStatusList.contains(valueStatus)
     };
   }
 }
 
-class PathDataValue extends BasePathDataValue {
+class PathDataValue extends BaseDataValue {
   String path;
-  PathDataMetadata metadata;
+  DataMetadata metadata;
   @override
   String rank;
   DataCategory category;
@@ -230,7 +230,7 @@ class PathDataValue extends BasePathDataValue {
   setTextAsString(String newText) {
     final isSupported = metadata.widgetKind == WidgetKind.text;
     if (!isSupported) {
-      throw PathDataError('Not supported for ${metadata.widgetKind}');
+      throw PathDataException('Not supported for ${metadata.widgetKind}');
     }
     text = newText;
     final successful = metadata.validator(text).isEmpty;
@@ -248,13 +248,13 @@ class PathDataValue extends BasePathDataValue {
   }
 }
 
-class SectionPathDataValue extends BasePathDataValue {
+class StartingSection extends BaseDataValue {
   String path;
-  SectionPathDataMetadata metadata;
+  SectionMetadata metadata;
   @override
   String rank;
 
-  SectionPathDataValue(
+  StartingSection(
       {required super.status,
       required this.path,
       required this.metadata,
@@ -263,7 +263,7 @@ class SectionPathDataValue extends BasePathDataValue {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is SectionPathDataValue &&
+      other is StartingSection &&
           runtimeType == other.runtimeType &&
           path == other.path &&
           metadata == other.metadata &&
@@ -278,15 +278,15 @@ class SectionPathDataValue extends BasePathDataValue {
   }
 }
 
-class EndingSectionPathDataValue extends BasePathDataValue {
+class EndingSection extends BaseDataValue {
   @override
   String rank;
-  EndingSectionPathDataValue({required super.status, required this.rank});
+  EndingSection({required super.status, required this.rank});
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is EndingSectionPathDataValue &&
+      other is EndingSection &&
           runtimeType == other.runtimeType &&
           rank == other.rank;
 
@@ -300,9 +300,9 @@ class EndingSectionPathDataValue extends BasePathDataValue {
 }
 
 class DataValueCollection {
-  SplayTreeMap<String, BasePathDataValue> pathDataValueMap =
-      SplayTreeMap<String, BasePathDataValue>((a, b) => a.compareTo(b));
-  update(BasePathDataValue added) {
+  SplayTreeMap<String, BaseDataValue> pathDataValueMap =
+      SplayTreeMap<String, BaseDataValue>((a, b) => a.compareTo(b));
+  update(BaseDataValue added) {
     pathDataValueMap.update(added.composedRank, (v) => added,
         ifAbsent: () => added);
   }
@@ -317,72 +317,72 @@ class DataValueCollection {
   List<String> toActiveRankList() => pathDataValueMap.values
       .whereType<PathDataValue>()
       .where((value) =>
-          BasePathDataValueFilter.hasNotCategory(value, DataCategory.template))
+          DataFilter.hasNotCategory(value, DataCategory.template))
       .map((value) => value.rank)
       .toSet()
       .toList()
     ..sort();
 
-  BasePathDataValue? findByRank(String rank,
+  BaseDataValue? findByRank(String rank,
           [DataCategory category = DataCategory.draft]) =>
       pathDataValueMap['$category-$rank'];
 
-  BasePathDataValue findByPath(String path,
+  BaseDataValue findByPath(String path,
       [DataCategory category = DataCategory.draft]) {
     return pathDataValueMap.values.firstWhere(
       (item) =>
-          BasePathDataValueFilter.hasPath(item, path) &&
-          BasePathDataValueFilter.hasCategory(item, category),
+          DataFilter.hasPath(item, path) &&
+          DataFilter.hasCategory(item, category),
     );
   }
 
   count() => pathDataValueMap.length;
 
   countByCategory(DataCategory category) => pathDataValueMap.values
-      .where((item) => BasePathDataValueFilter.hasCategory(item, category))
+      .where((item) => DataFilter.hasCategory(item, category))
       .length;
 
-  BasePathDataValue? firstWhere(bool Function(BasePathDataValue) where) {
-    final BasePathDataValue result = pathDataValueMap.values
+  BaseDataValue? firstWhere(bool Function(BaseDataValue) where) {
+    final BaseDataValue result = pathDataValueMap.values
         .toList()
-        .firstWhere(where, orElse: () => BasePathDataValue.ending(rank: ''));
+        .firstWhere(where, orElse: () => BaseDataValue.ending(rank: ''));
     return result.rank == '' ? null : result;
   }
 
   Iterable<PathDataValue> findAllByCategory(DataCategory category) =>
       pathDataValueMap.values.whereType<PathDataValue>().where((item) =>
-          BasePathDataValueFilter.hasCategory(item, DataCategory.template));
+          DataFilter.hasCategory(item, DataCategory.template));
 }
 
-class SuricattaDataNavigatorException implements Exception {
+class DataNavigatorException implements Exception {
   final String message;
-  SuricattaDataNavigatorException(this.message);
+  DataNavigatorException(this.message);
   @override
   String toString() => message;
 }
 
-class SuricattaDataNavigator {
+class DataNavigator {
   DataValueCollection dataValueCollection = DataValueCollection();
   HierarchicalIdentifierBuilder hierarchicalIdentifierBuilder =
       HierarchicalIdentifierBuilder();
   String? currentRank;
   String? possibleRank;
-  SuricattaDataNavigator();
+  DataNavigator();
 
   setRoot() {
     hierarchicalIdentifierBuilder.setRoot();
   }
 
-  addTemplate(String path, PathDataMetadata metadata) {
-    final template = BasePathDataValue.template(
+  addTemplate(String path, DataMetadata metadata) {
+    final template = BaseDataValue.template(
         path: path,
         metadata: metadata,
         rank: hierarchicalIdentifierBuilder.addChild().idAsString());
     dataValueCollection.update(template);
   }
 
-  addStart(String path, SectionPathDataMetadata metadata) {
-    final start = BasePathDataValue.start(
+  addStart(String path, SectionMetadata metadata) {
+    final start = BaseDataValue.start(
         path: path,
         metadata: metadata,
         rank: hierarchicalIdentifierBuilder.addChild().idAsString());
@@ -390,34 +390,34 @@ class SuricattaDataNavigator {
   }
 
   addEnding() {
-    final ending = BasePathDataValue.ending(
+    final ending = BaseDataValue.ending(
         rank: hierarchicalIdentifierBuilder.addChild().idAsString());
     dataValueCollection.update(ending);
   }
 
-  BasePathDataValue? findDataByPath(String path,
+  BaseDataValue? findDataByPath(String path,
       [DataCategory category = DataCategory.draft]) {
     return dataValueCollection.firstWhere(
       (item) =>
-          BasePathDataValueFilter.hasPath(item, path) &&
-          BasePathDataValueFilter.hasCategory(item, category),
+          DataFilter.hasPath(item, path) &&
+          DataFilter.hasCategory(item, category),
     );
   }
 
-  BasePathDataValue? findDataByRank(String rank,
+  BaseDataValue? findDataByRank(String rank,
       [DataCategory category = DataCategory.draft]) {
     return dataValueCollection.firstWhere(
       (item) =>
-          BasePathDataValueFilter.hasRank(item, rank) &&
-          BasePathDataValueFilter.hasCategory(item, category),
+          DataFilter.hasRank(item, rank) &&
+          DataFilter.hasCategory(item, category),
     );
   }
 
-  BasePathDataValue? getCurrent() {
+  BaseDataValue? getCurrent() {
     if (currentRank is String) {
       return findDataByRank(currentRank ?? '', DataCategory.draft);
     } else {
-      throw SuricattaDataNavigatorException('There is no current element');
+      throw DataNavigatorException('There is no current element');
     }
   }
 
@@ -428,7 +428,7 @@ class SuricattaDataNavigator {
         return maybeValue;
       }
     }
-    throw SuricattaDataNavigatorException(
+    throw DataNavigatorException(
         'Cannot get a current value for navigation');
   }
 
@@ -440,9 +440,9 @@ class SuricattaDataNavigator {
     return this;
   }
 
-  firstWhere(bool Function(BasePathDataValue) where) {
+  firstWhere(bool Function(BaseDataValue) where) {
     final matched = dataValueCollection.firstWhere(where);
-    if (matched is BasePathDataValue) {
+    if (matched is BaseDataValue) {
       possibleRank = matched.rank;
     } else {
       possibleRank = null;
@@ -467,7 +467,7 @@ class SuricattaDataNavigator {
     return this;
   }
 
-  nextWhere(bool Function(BasePathDataValue) where) {
+  nextWhere(bool Function(BaseDataValue) where) {
     final ranks = dataValueCollection.toRankList();
     final indexCurrent = ranks.indexOf(currentRank ?? '');
     final matched = dataValueCollection.firstWhere((value) {
@@ -475,7 +475,7 @@ class SuricattaDataNavigator {
       return (indexCurrent == -1 || matchingRank > indexCurrent) &&
           where(value);
     });
-    if (matched is BasePathDataValue) {
+    if (matched is BaseDataValue) {
       possibleRank = matched.rank;
     } else {
       possibleRank = null;
@@ -523,7 +523,7 @@ class SuricattaDataNavigator {
     if (previous is PathDataValue) {
       previous.setTextAsString(newText);
     } else {
-      throw SuricattaDataNavigatorException(
+      throw DataNavigatorException(
           "No existing value for rank: $rank and category: $category");
     }
   }
@@ -534,21 +534,21 @@ class SuricattaDataNavigator {
     if (previous is PathDataValue) {
       previous.setTextAsString(newText);
     } else {
-      throw SuricattaDataNavigatorException(
+      throw DataNavigatorException(
           "No existing value for path: $path and category: $category");
     }
   }
 
-  static List<String> toRankList(List<BasePathDataValue> valueList) => valueList
+  static List<String> toRankList(List<BaseDataValue> valueList) => valueList
       .whereType<PathDataValue>()
       .map((value) => value.rank)
       .toSet()
       .toList()
     ..sort();
 
-  static List<String> toActiveRankList(List<BasePathDataValue> valueList) =>
+  static List<String> toActiveRankList(List<BaseDataValue> valueList) =>
       toRankList(valueList
-          .where((value) => BasePathDataValueFilter.hasNotCategory(
+          .where((value) => DataFilter.hasNotCategory(
               value, DataCategory.template))
           .toList());
 }

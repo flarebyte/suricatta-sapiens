@@ -2,26 +2,26 @@ import 'package:flutter/material.dart';
 
 import '../model/widget_model.dart';
 
-IconData getLevelIcon(Level level) {
+IconData getLevelIcon(MessageLevel level) {
   switch (level) {
-    case Level.error:
+    case MessageLevel.error:
       return Icons.error;
-    case Level.warning:
+    case MessageLevel.warning:
       return Icons.warning;
-    case Level.info:
+    case MessageLevel.info:
       return Icons.info;
     default:
       return Icons.help;
   }
 }
 
-IconData getCategoryIcon(Category category) {
+IconData getCategoryIcon(MessageCategory category) {
   switch (category) {
-    case Category.syntax:
+    case MessageCategory.syntax:
       return Icons.code;
-    case Category.spelling:
+    case MessageCategory.spelling:
       return Icons.spellcheck;
-    case Category.server:
+    case MessageCategory.server:
       return Icons.cloud;
     default:
       return Icons.help;
@@ -43,13 +43,13 @@ IconData getNavigationPathStatusIcon(DataStatus status) {
   }
 }
 
-Color getLevelColor(Level level) {
+Color getLevelColor(MessageLevel level) {
   switch (level) {
-    case Level.error:
+    case MessageLevel.error:
       return Colors.red;
-    case Level.warning:
+    case MessageLevel.warning:
       return Colors.orange;
-    case Level.info:
+    case MessageLevel.info:
       return Colors.blue;
     default:
       return Colors.grey;
@@ -71,13 +71,13 @@ Color getNavigationPathStatusColor(DataStatus status) {
   }
 }
 
-Color getCategoryColor(Category category) {
+Color getCategoryColor(MessageCategory category) {
   switch (category) {
-    case Category.syntax:
+    case MessageCategory.syntax:
       return Colors.purple;
-    case Category.spelling:
+    case MessageCategory.spelling:
       return Colors.green;
-    case Category.server:
+    case MessageCategory.server:
       return Colors.cyan;
     default:
       return Colors.grey;
