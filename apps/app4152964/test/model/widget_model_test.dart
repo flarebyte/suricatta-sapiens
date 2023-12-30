@@ -26,7 +26,9 @@ final contactEmailMeta = DataMetadata(
           return [];
         }
       }
-      return [Message('Incorrect email', MessageLevel.error, MessageCategory.syntax)];
+      return [
+        Message('Incorrect email', MessageLevel.error, MessageCategory.syntax)
+      ];
     });
 
 void main() {
@@ -144,6 +146,15 @@ void main() {
           .move()
           .getCurrent();
       expect(actual.path, 'contact/email');
+    });
+
+    test('change current value', () {
+      final navigator = refNavigator;
+      navigator
+          .firstWhere((v) => DataFilter.hasPath(v, 'contact/region'))
+          .move();
+      navigator.setCurrentText('new region');
+      expect(navigator.getCurrentValue().text, 'new region');
     });
 
     test('firstWhere should deal gracefully with no result', () {

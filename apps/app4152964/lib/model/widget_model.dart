@@ -535,6 +535,14 @@ class DataNavigator {
     }
   }
 
+  setCurrentText(String newText) {
+    if (currentRank is String) {
+      setTextAsStringByRank(newText, rank: currentRank ?? '');
+    } else {
+      throw DataNavigatorException('Current rank is not set');
+    }
+  }
+
   static List<String> toRankList(List<BaseDataValue> valueList) => valueList
       .whereType<PathDataValue>()
       .map((value) => value.rank)
