@@ -12,6 +12,11 @@ enum DataStatus {
   todo,
 }
 
+enum ViewStatus {
+  full,
+  minimized,
+}
+
 enum WidgetKind { text, number }
 
 enum DataCategory { draft, loaded, refreshed, template, starting, ending }
@@ -62,10 +67,15 @@ class DataPreview {
 }
 
 sealed class BaseDataValue {
-  DataStatus _status;
-  BaseDataValue({required DataStatus status}) : _status = status;
+  DataStatus _status = DataStatus.todo;
+  ViewStatus _viewStatus = ViewStatus.full;
+  BaseDataValue({required DataStatus status, required ViewStatus viewStatus}) {
+    _status = status;
+    _viewStatus = viewStatus;
+  }
 
   DataStatus get status => _status;
+  ViewStatus get viewStatus => _viewStatus;
 
   String get rank => switch (this) {
         EndingSection(rank: var valueRank) => valueRank,
@@ -99,6 +109,7 @@ sealed class BaseDataValue {
       String? text}) {
     return PathDataValue(
       status: status,
+      viewStatus: ViewStatus.full,
       path: path,
       metadata: metadata,
       rank: rank,
@@ -110,6 +121,7 @@ sealed class BaseDataValue {
       {required String path, required metadata, required String rank}) {
     return PathDataValue(
       status: DataStatus.todo,
+      viewStatus: ViewStatus.full,
       path: path,
       metadata: metadata,
       rank: rank,
@@ -123,14 +135,15 @@ sealed class BaseDataValue {
   }) {
     return StartingSection(
       status: DataStatus.todo,
+      viewStatus: ViewStatus.full,
       path: path,
       metadata: metadata,
       rank: rank,
     );
   }
 
-  factory BaseDataValue.ending({required String rank}) =>
-      EndingSection(status: DataStatus.todo, rank: rank);
+  factory BaseDataValue.ending({required String rank}) => EndingSection(
+      status: DataStatus.todo, viewStatus: ViewStatus.full, rank: rank);
 }
 
 class DataFilter {
@@ -195,10 +208,12 @@ class PathDataValue extends BaseDataValue {
   DataCategory category;
   @override
   String? text;
+  @override
   List<Message> messages;
 
   PathDataValue({
     required super.status,
+    required super.viewStatus,
     required this.path,
     required this.metadata,
     required this.rank,
@@ -228,7 +243,7 @@ class PathDataValue extends BaseDataValue {
 
   @override
   String toString() {
-    return 'PathDataValue{path: $path, metadata: $metadata, rank: $rank, category: $category, text: $text}';
+    return 'PathDataValue{path: $path, metadata: $metadata, rank: $rank, category: $category, text: $text, status: $status, view status: $viewStatus}';
   }
 
   setTextAsString(String newText) {
@@ -245,12 +260,14 @@ class PathDataValue extends BaseDataValue {
 
   factory PathDataValue.todo(PathDataValue template) {
     return PathDataValue(
-        path: template.path,
-        metadata: template.metadata,
-        rank: template.rank,
-        category: DataCategory.draft,
-        text: template.text,
-        status: DataStatus.todo);
+      path: template.path,
+      metadata: template.metadata,
+      rank: template.rank,
+      category: DataCategory.draft,
+      text: template.text,
+      status: DataStatus.todo,
+      viewStatus: ViewStatus.full,
+    );
   }
 }
 
@@ -262,6 +279,7 @@ class StartingSection extends BaseDataValue {
 
   StartingSection(
       {required super.status,
+      required super.viewStatus,
       required this.path,
       required this.metadata,
       required this.rank});
@@ -287,7 +305,8 @@ class StartingSection extends BaseDataValue {
 class EndingSection extends BaseDataValue {
   @override
   String rank;
-  EndingSection({required super.status, required this.rank});
+  EndingSection(
+      {required super.status, required super.viewStatus, required this.rank});
 
   @override
   bool operator ==(Object other) =>

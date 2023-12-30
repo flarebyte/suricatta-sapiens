@@ -188,6 +188,7 @@ void main() {
   group('BasePathDataValueFilter', () {
     final contactName = PathDataValue(
         status: DataStatus.populated,
+        viewStatus: ViewStatus.full,
         path: 'contact/name',
         metadata: contactNameMeta,
         rank: '001:001',
