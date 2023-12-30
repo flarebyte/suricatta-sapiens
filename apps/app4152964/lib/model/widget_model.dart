@@ -298,10 +298,10 @@ class EndingSectionPathDataValue extends BasePathDataValue {
   }
 }
 
-class BasePathDataValueCollection {
+class DataValueCollection {
   SplayTreeMap<String, BasePathDataValue> pathDataValueMap =
       SplayTreeMap<String, BasePathDataValue>((a, b) => a.compareTo(b));
-  add(BasePathDataValue added) {
+  update(BasePathDataValue added) {
     pathDataValueMap.update(added.composedRank, (v) => added);
   }
 
@@ -325,7 +325,7 @@ class BasePathDataValueCollection {
           [DataCategory category = DataCategory.draft]) =>
       pathDataValueMap['$category-$rank'];
 
-  BasePathDataValue findDataByPath(String path,
+  BasePathDataValue findByPath(String path,
       [DataCategory category = DataCategory.draft]) {
     return pathDataValueMap.values.firstWhere(
       (item) =>
@@ -356,7 +356,7 @@ class SuricattaDataNavigatorException implements Exception {
 }
 
 class SuricattaDataNavigator {
-  BasePathDataValueCollection dataValueCollection = BasePathDataValueCollection();
+  DataValueCollection dataValueCollection = DataValueCollection();
   HierarchicalIdentifierBuilder hierarchicalIdentifierBuilder =
       HierarchicalIdentifierBuilder();
   String? currentRank;
@@ -372,7 +372,7 @@ class SuricattaDataNavigator {
         path: path,
         metadata: metadata,
         rank: hierarchicalIdentifierBuilder.addChild().idAsString());
-    dataValueCollection.add(template);
+    dataValueCollection.update(template);
   }
 
   addStart(String path, SectionPathDataMetadata metadata) {
@@ -380,13 +380,13 @@ class SuricattaDataNavigator {
         path: path,
         metadata: metadata,
         rank: hierarchicalIdentifierBuilder.addChild().idAsString());
-    dataValueCollection.add(start);
+    dataValueCollection.update(start);
   }
 
   addEnding() {
     final ending = BasePathDataValue.ending(
         rank: hierarchicalIdentifierBuilder.addChild().idAsString());
-    dataValueCollection.add(ending);
+    dataValueCollection.update(ending);
   }
 
   BasePathDataValue findDataByPath(String path,
@@ -518,7 +518,7 @@ class SuricattaDataNavigator {
 
   setTextAsStringByPath(String newText,
       {required String path, DataCategory category = DataCategory.draft}) {
-    final previous = dataValueCollection.findDataByPath(path, category);
+    final previous = dataValueCollection.findByPath(path, category);
     if (previous is PathDataValue) {
       previous.setTextAsString(newText);
     } else {
