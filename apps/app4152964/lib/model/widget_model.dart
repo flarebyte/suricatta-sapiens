@@ -342,8 +342,12 @@ class DataValueCollection {
       .where((item) => BasePathDataValueFilter.hasCategory(item, category))
       .length;
 
-  firstWhere(bool Function(BasePathDataValue) where) =>
-      pathDataValueMap.values.firstWhere(where);
+  BasePathDataValue? firstWhere(bool Function(BasePathDataValue) where) {
+    final BasePathDataValue result = pathDataValueMap.values
+        .toList()
+        .firstWhere(where, orElse: () => BasePathDataValue.ending(rank: ''));
+    return result.rank == '' ? null : result;
+  }
 
   Iterable<PathDataValue> findAllByCategory(DataCategory category) =>
       pathDataValueMap.values.whereType<PathDataValue>().where((item) =>
@@ -391,7 +395,7 @@ class SuricattaDataNavigator {
     dataValueCollection.update(ending);
   }
 
-  BasePathDataValue findDataByPath(String path,
+  BasePathDataValue? findDataByPath(String path,
       [DataCategory category = DataCategory.draft]) {
     return dataValueCollection.firstWhere(
       (item) =>
@@ -400,7 +404,7 @@ class SuricattaDataNavigator {
     );
   }
 
-  BasePathDataValue findDataByRank(String rank,
+  BasePathDataValue? findDataByRank(String rank,
       [DataCategory category = DataCategory.draft]) {
     return dataValueCollection.firstWhere(
       (item) =>
@@ -409,7 +413,7 @@ class SuricattaDataNavigator {
     );
   }
 
-  BasePathDataValue getCurrent() {
+  BasePathDataValue? getCurrent() {
     if (currentRank is String) {
       return findDataByRank(currentRank ?? '', DataCategory.draft);
     } else {
@@ -438,7 +442,9 @@ class SuricattaDataNavigator {
 
   firstWhere(bool Function(BasePathDataValue) where) {
     final matched = dataValueCollection.firstWhere(where);
-    possibleRank = matched.rank;
+    if (matched is BasePathDataValue) {
+      possibleRank = matched.rank;
+    }
     return this;
   }
 
@@ -467,7 +473,9 @@ class SuricattaDataNavigator {
       return (indexCurrent == -1 || matchingRank > indexCurrent) &&
           where(value);
     });
-    possibleRank = matched.rank;
+    if (matched is BasePathDataValue) {
+      possibleRank = matched.rank;
+    }
     return this;
   }
 

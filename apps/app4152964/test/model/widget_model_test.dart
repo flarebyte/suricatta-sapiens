@@ -64,21 +64,33 @@ void main() {
     test('findDataByPath returns populated record', () {
       final navigator = refNavigator;
       final actual = navigator.findDataByPath('contact/name');
+      if (actual is! BasePathDataValue) {
+        fail('No data at path');
+      }
       expect(actual.text, 'draft contact name');
       expect(actual.status, DataStatus.populated);
     });
     test('findDataByPath returns error record', () {
       final navigator = refNavigator;
       final actual = navigator.findDataByPath('contact/email');
+      if (actual is! BasePathDataValue) {
+        fail('No data at path');
+      }
       expect(actual.status, DataStatus.error);
     });
 
     test('findDataByRank returns populated record', () {
       final navigator = refNavigator;
-      final rank = navigator.findDataByPath('contact/name').rank;
-      final actual = navigator.findDataByRank(rank);
-      expect(actual.text, 'draft contact name');
-      expect(actual.status, DataStatus.populated);
+      final actual = navigator.findDataByPath('contact/name');
+      if (actual is! BasePathDataValue) {
+        fail('No data at path');
+      }
+      final actualByRank = navigator.findDataByRank(actual.rank);
+      if (actualByRank is! BasePathDataValue) {
+        fail('No data at rank ${actual.rank}');
+      }
+      expect(actualByRank.text, 'draft contact name');
+      expect(actualByRank.status, DataStatus.populated);
     });
 
     test('first returns first record', () {
@@ -103,9 +115,12 @@ void main() {
     test('previous returns previous record', () {
       final navigator = refNavigator;
       expect(navigator.last().move().getCurrentValue().path, 'contact/email');
-      expect(navigator.previous().move().getCurrentValue().path, 'contact/region');
-      expect(navigator.previous().move().getCurrentValue().path, 'contact/country');
-      expect(navigator.previous().move().getCurrentValue().path, 'contact/city');
+      expect(
+          navigator.previous().move().getCurrentValue().path, 'contact/region');
+      expect(navigator.previous().move().getCurrentValue().path,
+          'contact/country');
+      expect(
+          navigator.previous().move().getCurrentValue().path, 'contact/city');
     });
 
     test('firstWhere returns matching a criteria', () {
