@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:js_util';
 
 import 'hierarchical_identifier.dart';
 
@@ -324,8 +325,27 @@ class BasePathDataValueCollection {
   SplayTreeMap<String, BasePathDataValue> pathDataValueMap =
       SplayTreeMap<String, BasePathDataValue>((a, b) => a.compareTo(b));
   add(BasePathDataValue added) {
+    if (typeofEquals(added, 'UnknownPathDataValue')) {
+      return;
+    }
     pathDataValueMap.update(added.composedRank, (v) => added);
   }
+
+  List<String> toRankList() => pathDataValueMap.values
+      .whereType<PathDataValue>()
+      .map((value) => value.rank)
+      .toSet()
+      .toList()
+    ..sort();
+
+  List<String> toActiveRankList() => pathDataValueMap.values
+      .whereType<PathDataValue>()
+      .where((value) =>
+          BasePathDataValueFilter.hasNotCategory(value, DataCategory.template))
+      .map((value) => value.rank)
+      .toSet()
+      .toList()
+    ..sort();
 
   BasePathDataValue? findByRank(String rank,
           [DataCategory category = DataCategory.draft]) =>
@@ -341,8 +361,19 @@ class BasePathDataValueCollection {
     );
   }
 
+  count() => pathDataValueMap.length;
+
+  countByCategory(DataCategory category) => pathDataValueMap.values
+      .where((item) => BasePathDataValueFilter.hasCategory(item, category))
+      .length;
+
   firstWhere(bool Function(BasePathDataValue) where) => pathDataValueMap.values
       .firstWhere(where, orElse: () => BasePathDataValue.unknown());
+
+  Iterable<PathDataValue> findAllByCategory(DataCategory category) =>
+      pathDataValueMap.values.whereType<PathDataValue>().where((item) =>
+          BasePathDataValueFilter.hasCategory(item, DataCategory.template));
+
 }
 
 class SuricattaDataNavigatorException implements Exception {
@@ -353,7 +384,7 @@ class SuricattaDataNavigatorException implements Exception {
 }
 
 class SuricattaDataNavigator {
-  List<BasePathDataValue> pathDataValueList = [];
+  BasePathDataValueCollection pathDataValueList = BasePathDataValueCollection();
   HierarchicalIdentifierBuilder hierarchicalIdentifierBuilder =
       HierarchicalIdentifierBuilder();
   String? currentRank;
@@ -392,7 +423,6 @@ class SuricattaDataNavigator {
       (item) =>
           BasePathDataValueFilter.hasPath(item, path) &&
           BasePathDataValueFilter.hasCategory(item, category),
-      orElse: () => BasePathDataValue.unknown(),
     );
   }
 
@@ -402,7 +432,6 @@ class SuricattaDataNavigator {
       (item) =>
           BasePathDataValueFilter.hasRank(item, rank) &&
           BasePathDataValueFilter.hasCategory(item, category),
-      orElse: () => BasePathDataValue.unknown(),
     );
   }
 
@@ -428,26 +457,25 @@ class SuricattaDataNavigator {
   bool hasCurrent() => (currentRank is String);
 
   first() {
-    final firstRank = toActiveRankList(pathDataValueList).firstOrNull;
+    final firstRank = pathDataValueList.toActiveRankList().firstOrNull;
     possibleRank = firstRank;
     return this;
   }
 
   firstWhere(bool Function(BasePathDataValue) where) {
-    final matched = pathDataValueList.firstWhere(where,
-        orElse: () => BasePathDataValue.unknown());
+    final matched = pathDataValueList.firstWhere(where);
     possibleRank = matched.rank;
     return this;
   }
 
   last() {
-    final lastRank = toActiveRankList(pathDataValueList).lastOrNull;
+    final lastRank = pathDataValueList.toActiveRankList().lastOrNull;
     possibleRank = lastRank;
     return this;
   }
 
   next() {
-    final ranks = toActiveRankList(pathDataValueList);
+    final ranks = pathDataValueList.toActiveRankList();
     final indexCurrent = ranks.indexOf(currentRank ?? '');
     if (indexCurrent >= 0 && indexCurrent < ranks.length - 1) {
       possibleRank = ranks[indexCurrent + 1];
@@ -458,19 +486,19 @@ class SuricattaDataNavigator {
   }
 
   nextWhere(bool Function(BasePathDataValue) where) {
-    final ranks = toRankList(pathDataValueList);
+    final ranks = pathDataValueList.toRankList();
     final indexCurrent = ranks.indexOf(currentRank ?? '');
     final matched = pathDataValueList.firstWhere((value) {
       final matchingRank = ranks.indexOf(value.rank ?? '');
       return (indexCurrent == -1 || matchingRank > indexCurrent) &&
           where(value);
-    }, orElse: () => BasePathDataValue.unknown());
+    });
     possibleRank = matched.rank;
     return this;
   }
 
   previous() {
-    final ranks = toActiveRankList(pathDataValueList);
+    final ranks = pathDataValueList.toActiveRankList();
     final indexCurrent = ranks.indexOf(currentRank ?? '');
     if (indexCurrent > 0) {
       possibleRank = ranks[indexCurrent - 1];
@@ -489,26 +517,24 @@ class SuricattaDataNavigator {
     return this;
   }
 
-  count() => pathDataValueList.length;
+  count() => pathDataValueList.count();
 
-  countByCategory(DataCategory category) => pathDataValueList
-      .where((item) => BasePathDataValueFilter.hasCategory(item, category))
-      .length;
+  countByCategory(DataCategory category) =>
+      pathDataValueList.countByCategory(category);
 
   createRootTodos() {
-    final todoTemplates = pathDataValueList.whereType<PathDataValue>().where(
-        (item) =>
-            BasePathDataValueFilter.hasCategory(item, DataCategory.template));
+    final todoTemplates = pathDataValueList.findAllByCategory(DataCategory.template);
     List<BasePathDataValue> newPathDataValueList = [];
     for (PathDataValue template in todoTemplates) {
       final todo = PathDataValue.todo(template);
       newPathDataValueList.add(todo);
     }
-    pathDataValueList = newPathDataValueList;
+    // pathDataValueList = newPathDataValueList;
   }
 
   setTextAsStringByRank(String newText,
       {required String rank, DataCategory category = DataCategory.draft}) {
+    PathDataValue newData = PathDataValue()
     pathDataValueList
         .whereType<PathDataValue>()
         .where((item) =>
