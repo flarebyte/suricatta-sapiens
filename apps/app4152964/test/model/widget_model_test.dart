@@ -26,7 +26,7 @@ final contactEmailMeta = DataMetadata(
           return [];
         }
       }
-      return [Message('', MessageLevel.error, MessageCategory.syntax)];
+      return [Message('Incorrect email', MessageLevel.error, MessageCategory.syntax)];
     });
 
 void main() {
