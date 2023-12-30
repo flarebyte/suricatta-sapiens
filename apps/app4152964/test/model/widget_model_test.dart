@@ -79,6 +79,7 @@ void main() {
         fail('No data at path');
       }
       expect(actual.status, DataStatus.error);
+      expect(actual.messages.length, 1);
     });
 
     test('findDataByRank returns populated record', () {

@@ -85,6 +85,11 @@ sealed class BaseDataValue {
         PathDataValue(text: var valueText) => valueText,
         StartingSection() => null
       };
+  List<Message> get messages => switch (this) {
+        EndingSection() => [],
+        PathDataValue(messages: var messageList) => messageList,
+        StartingSection() => []
+      };
 
   factory BaseDataValue.some(
       {required DataStatus status,
@@ -190,6 +195,7 @@ class PathDataValue extends BaseDataValue {
   DataCategory category;
   @override
   String? text;
+  List<Message> messages;
 
   PathDataValue({
     required super.status,
@@ -198,6 +204,7 @@ class PathDataValue extends BaseDataValue {
     required this.rank,
     required this.category,
     this.text,
+    this.messages = const [],
   });
 
   @override
@@ -230,8 +237,10 @@ class PathDataValue extends BaseDataValue {
       throw PathDataException('Not supported for ${metadata.widgetKind}');
     }
     text = newText;
-    final unsuccessful = Message.hasError(metadata.validator(text));
+    final validationResults = metadata.validator(text);
+    final unsuccessful = Message.hasError(validationResults);
     _status = unsuccessful ? DataStatus.error : DataStatus.populated;
+    messages = validationResults;
   }
 
   factory PathDataValue.todo(PathDataValue template) {
