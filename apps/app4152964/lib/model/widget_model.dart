@@ -8,10 +8,7 @@ enum MessageCategory { syntax, spelling, server }
 
 enum DataStatus {
   populated,
-  warning,
   error,
-  skipped,
-  unknown,
   todo,
 }
 
@@ -25,6 +22,9 @@ class Message {
   MessageCategory category;
 
   Message(this.message, this.level, this.category);
+
+  static bool hasError(List<Message> messages) =>
+      messages.any((message) => message.level == MessageLevel.error);
 }
 
 class PathDataException implements Exception {
@@ -148,15 +148,12 @@ class DataFilter {
   static bool hasStatus(BaseDataValue value, DataStatus searchStatus) {
     return switch (value) {
       PathDataValue(status: var valueStatus) => valueStatus == searchStatus,
-      StartingSection(status: var valueStatus) =>
-        valueStatus == searchStatus,
-      EndingSection(status: var valueStatus) =>
-        valueStatus == searchStatus,
+      StartingSection(status: var valueStatus) => valueStatus == searchStatus,
+      EndingSection(status: var valueStatus) => valueStatus == searchStatus,
     };
   }
 
-  static bool hasCategory(
-      BaseDataValue value, DataCategory searchCategory) {
+  static bool hasCategory(BaseDataValue value, DataCategory searchCategory) {
     return switch (value) {
       PathDataValue(category: var valueCategory) =>
         valueCategory == searchCategory,
@@ -233,8 +230,8 @@ class PathDataValue extends BaseDataValue {
       throw PathDataException('Not supported for ${metadata.widgetKind}');
     }
     text = newText;
-    final successful = metadata.validator(text).isEmpty;
-    _status = successful ? DataStatus.populated : DataStatus.error;
+    final unsuccessful = Message.hasError(metadata.validator(text));
+    _status = unsuccessful ? DataStatus.error : DataStatus.populated;
   }
 
   factory PathDataValue.todo(PathDataValue template) {
@@ -316,8 +313,7 @@ class DataValueCollection {
 
   List<String> toActiveRankList() => pathDataValueMap.values
       .whereType<PathDataValue>()
-      .where((value) =>
-          DataFilter.hasNotCategory(value, DataCategory.template))
+      .where((value) => DataFilter.hasNotCategory(value, DataCategory.template))
       .map((value) => value.rank)
       .toSet()
       .toList()
@@ -350,8 +346,9 @@ class DataValueCollection {
   }
 
   Iterable<PathDataValue> findAllByCategory(DataCategory category) =>
-      pathDataValueMap.values.whereType<PathDataValue>().where((item) =>
-          DataFilter.hasCategory(item, DataCategory.template));
+      pathDataValueMap.values
+          .whereType<PathDataValue>()
+          .where((item) => DataFilter.hasCategory(item, DataCategory.template));
 }
 
 class DataNavigatorException implements Exception {
@@ -428,8 +425,7 @@ class DataNavigator {
         return maybeValue;
       }
     }
-    throw DataNavigatorException(
-        'Cannot get a current value for navigation');
+    throw DataNavigatorException('Cannot get a current value for navigation');
   }
 
   bool hasCurrent() => (currentRank is String);
@@ -548,8 +544,8 @@ class DataNavigator {
 
   static List<String> toActiveRankList(List<BaseDataValue> valueList) =>
       toRankList(valueList
-          .where((value) => DataFilter.hasNotCategory(
-              value, DataCategory.template))
+          .where((value) =>
+              DataFilter.hasNotCategory(value, DataCategory.template))
           .toList());
 }
 

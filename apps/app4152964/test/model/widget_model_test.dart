@@ -140,8 +140,7 @@ void main() {
     test('firstWhere returns matching a criteria', () {
       final navigator = refNavigator;
       final actual = navigator
-          .firstWhere(
-              (v) => DataFilter.hasPath(v, 'contact/email'))
+          .firstWhere((v) => DataFilter.hasPath(v, 'contact/email'))
           .move()
           .getCurrent();
       expect(actual.path, 'contact/email');
@@ -149,16 +148,15 @@ void main() {
 
     test('firstWhere should deal gracefully with no result', () {
       final navigator = refNavigator;
-      final actual = navigator
-          .firstWhere((v) => DataFilter.hasRank(v, '001:111'));
+      final actual =
+          navigator.firstWhere((v) => DataFilter.hasRank(v, '001:111'));
       expect(actual.canMove(), false);
     });
 
     test('nextWhere returns matching a criteria', () {
       final navigator = refNavigator;
       final actual = navigator
-          .nextWhere(
-              (v) => DataFilter.hasStatus(v, DataStatus.error))
+          .nextWhere((v) => DataFilter.hasStatus(v, DataStatus.error))
           .move()
           .getCurrent();
       expect(actual.path, 'contact/email');
@@ -169,8 +167,7 @@ void main() {
       final actual = navigator
           .first()
           .move()
-          .nextWhere(
-              (v) => DataFilter.hasStatus(v, DataStatus.populated))
+          .nextWhere((v) => DataFilter.hasStatus(v, DataStatus.populated))
           .move()
           .getCurrent();
       expect(actual.path, 'contact/city');
@@ -184,13 +181,11 @@ void main() {
         rank: '001:001',
         category: DataCategory.draft);
     test('hasPath should match if same path', () {
-      expect(
-          DataFilter.hasPath(contactName, 'contact/name'), true);
+      expect(DataFilter.hasPath(contactName, 'contact/name'), true);
     });
 
     test('hasPath should not match if path are different', () {
-      expect(DataFilter.hasPath(contactName, 'contact/whatever'),
-          false);
+      expect(DataFilter.hasPath(contactName, 'contact/whatever'), false);
     });
 
     test('hasRank should match if same rank', () {
@@ -202,14 +197,11 @@ void main() {
     });
 
     test('hasStatus should match if same status', () {
-      expect(
-          DataFilter.hasStatus(contactName, DataStatus.populated),
-          true);
+      expect(DataFilter.hasStatus(contactName, DataStatus.populated), true);
     });
 
     test('hasStatus should not match if status are different', () {
-      expect(DataFilter.hasStatus(contactName, DataStatus.error),
-          false);
+      expect(DataFilter.hasStatus(contactName, DataStatus.error), false);
     });
 
     test('hasAnyStatus should match if any status matching', () {
@@ -222,7 +214,7 @@ void main() {
     test('hasAnyStatus should not match if no status matching', () {
       expect(
           DataFilter.hasAnyStatus(
-              contactName, [DataStatus.todo, DataStatus.skipped]),
+              contactName, [DataStatus.todo, DataStatus.error]),
           false);
     });
   });
