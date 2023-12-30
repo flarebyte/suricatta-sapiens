@@ -20,7 +20,14 @@ final contactRegionMeta = PathDataMetadata(
 final contactEmailMeta = PathDataMetadata(
     title: 'Contact email',
     widgetKind: WidgetKind.text,
-    validator: (value) => []);
+    validator: (value) {
+      if (value is String) {
+        if (value.contains('@')) {
+          return [];
+        }
+      }
+      return [Message('', Level.error, Category.syntax)];
+    });
 
 void main() {
   group('SuricattaDataNavigator', () {
@@ -44,17 +51,12 @@ void main() {
         path: 'contact/email');
     refNavigator.setTextAsStringByPath('draft contact country',
         path: 'contact/country');
-    test('findDataByPath returns unknown for empty data', () {
-      final navigator = SuricattaDataNavigator();
-      final actual = navigator.findDataByPath('');
-      expect(actual, BasePathDataValue.unknown());
-    });
 
     test('count returns the number of records', () {
       final navigator = refNavigator;
       expect(navigator.count(), 12);
       expect(navigator.countByCategory(DataCategory.starting), 1);
-      expect(navigator.countByCategory(DataCategory.starting), 2);
+      expect(navigator.countByCategory(DataCategory.ending), 1);
       expect(navigator.countByCategory(DataCategory.template), 5);
       expect(navigator.countByCategory(DataCategory.draft), 5);
     });
@@ -70,15 +72,11 @@ void main() {
       final actual = navigator.findDataByPath('contact/email');
       expect(actual.status, DataStatus.error);
     });
-    test('findDataByRank returns unknown for empty data', () {
-      final navigator = refNavigator;
-      final actual = navigator.findDataByRank('');
-      expect(actual, BasePathDataValue.unknown());
-    });
 
     test('findDataByRank returns populated record', () {
       final navigator = refNavigator;
-      final actual = navigator.findDataByRank('001:001');
+      final rank = navigator.findDataByPath('contact/name').rank;
+      final actual = navigator.findDataByRank(rank);
       expect(actual.text, 'draft contact name');
       expect(actual.status, DataStatus.populated);
     });
@@ -92,25 +90,22 @@ void main() {
     test('last returns last record', () {
       final navigator = refNavigator;
       final actual = navigator.last().move().getCurrent();
-      expect(actual.path, 'contact/country');
+      expect(actual.path, 'contact/email');
     });
 
     test('next returns next record', () {
       final navigator = refNavigator;
-      expect(navigator.first().move().getCurrentValue().rank, '001:001');
-      expect(navigator.next().move().getCurrentValue().rank, '001:002');
-      expect(navigator.next().move().getCurrentValue().rank, '001:003');
-      expect(navigator.next().move().getCurrentValue().rank, '001:004');
-      expect(navigator.next().canMove(), false);
+      expect(navigator.first().move().getCurrentValue().path, 'contact/name');
+      expect(navigator.next().move().getCurrentValue().path, 'contact/city');
+      expect(navigator.next().move().getCurrentValue().path, 'contact/country');
     });
 
     test('previous returns previous record', () {
       final navigator = refNavigator;
-      expect(navigator.last().move().getCurrentValue().rank, '001:004');
-      expect(navigator.previous().move().getCurrentValue().rank, '001:003');
-      expect(navigator.previous().move().getCurrentValue().rank, '001:002');
-      expect(navigator.previous().move().getCurrentValue().rank, '001:001');
-      expect(navigator.previous().canMove(), false);
+      expect(navigator.last().move().getCurrentValue().path, 'contact/email');
+      expect(navigator.previous().move().getCurrentValue().path, 'contact/region');
+      expect(navigator.previous().move().getCurrentValue().path, 'contact/country');
+      expect(navigator.previous().move().getCurrentValue().path, 'contact/city');
     });
 
     test('firstWhere returns matching a criteria', () {

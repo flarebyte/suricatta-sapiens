@@ -233,7 +233,8 @@ class PathDataValue extends BasePathDataValue {
       throw PathDataError('Not supported for ${metadata.widgetKind}');
     }
     text = newText;
-    _status = DataStatus.populated;
+    final successful = metadata.validator(text).isEmpty;
+    _status = successful ? DataStatus.populated : DataStatus.error;
   }
 
   factory PathDataValue.todo(PathDataValue template) {
@@ -302,7 +303,8 @@ class DataValueCollection {
   SplayTreeMap<String, BasePathDataValue> pathDataValueMap =
       SplayTreeMap<String, BasePathDataValue>((a, b) => a.compareTo(b));
   update(BasePathDataValue added) {
-    pathDataValueMap.update(added.composedRank, (v) => added);
+    pathDataValueMap.update(added.composedRank, (v) => added,
+        ifAbsent: () => added);
   }
 
   List<String> toRankList() => pathDataValueMap.values
@@ -496,13 +498,11 @@ class SuricattaDataNavigator {
 
   createRootTodos() {
     final todoTemplates =
-        dataValueCollection.findAllByCategory(DataCategory.template);
-    List<BasePathDataValue> newPathDataValueList = [];
+        dataValueCollection.findAllByCategory(DataCategory.template).toList();
     for (PathDataValue template in todoTemplates) {
       final todo = PathDataValue.todo(template);
-      newPathDataValueList.add(todo);
+      dataValueCollection.update(todo);
     }
-    // pathDataValueList = newPathDataValueList;
   }
 
   setTextAsStringByRank(String newText,
