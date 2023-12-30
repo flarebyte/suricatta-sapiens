@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'hierarchical_identifier.dart';
 
 enum Level { error, warning, info }
@@ -70,6 +72,14 @@ sealed class BasePathDataValue {
         EndingSectionPathDataValue(rank: var valueRank) => valueRank,
         PathDataValue(rank: var valueRank) => valueRank,
         SectionPathDataValue(rank: var valueRank) => valueRank
+      };
+
+  String get composedRank => switch (this) {
+        UnknownPathDataValue() => 'unknown',
+        EndingSectionPathDataValue(rank: var valueRank) => 'end-$valueRank',
+        PathDataValue(rank: var valueRank, category: var valueCategory) =>
+          '$valueCategory-$valueRank',
+        SectionPathDataValue(rank: var valueRank) => 'start-$valueRank',
       };
 
   String? get text => switch (this) {
@@ -308,6 +318,31 @@ class EndingSectionPathDataValue extends BasePathDataValue {
   String toString() {
     return 'EndingSectionPathDataValue{rank: $rank}';
   }
+}
+
+class BasePathDataValueCollection {
+  SplayTreeMap<String, BasePathDataValue> pathDataValueMap =
+      SplayTreeMap<String, BasePathDataValue>((a, b) => a.compareTo(b));
+  add(BasePathDataValue added) {
+    pathDataValueMap.update(added.composedRank, (v) => added);
+  }
+
+  BasePathDataValue? findByRank(String rank,
+          [DataCategory category = DataCategory.draft]) =>
+      pathDataValueMap['$category-$rank'];
+
+  BasePathDataValue findDataByPath(String path,
+      [DataCategory category = DataCategory.draft]) {
+    return pathDataValueMap.values.firstWhere(
+      (item) =>
+          BasePathDataValueFilter.hasPath(item, path) &&
+          BasePathDataValueFilter.hasCategory(item, category),
+      orElse: () => BasePathDataValue.unknown(),
+    );
+  }
+
+  firstWhere(bool Function(BasePathDataValue) where) => pathDataValueMap.values
+      .firstWhere(where, orElse: () => BasePathDataValue.unknown());
 }
 
 class SuricattaDataNavigatorException implements Exception {
