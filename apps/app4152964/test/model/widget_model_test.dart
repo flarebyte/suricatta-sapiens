@@ -99,10 +99,24 @@ void main() {
       expect(actualRank.path, 'contact/name');
     });
 
+    test('You should not be able to go before first record', () {
+      final navigator = refNavigator;
+      navigator.first().move();
+      navigator.previous();
+      expect(navigator.canMove(), false);
+    });
+
     test('last returns last record', () {
       final navigator = refNavigator;
       final actual = navigator.last().move().getCurrent();
       expect(actual.path, 'contact/email');
+    });
+
+    test('You should not be able to go after last record', () {
+      final navigator = refNavigator;
+      navigator.last().move();
+      navigator.next();
+      expect(navigator.canMove(), false);
     });
 
     test('next returns next record', () {
