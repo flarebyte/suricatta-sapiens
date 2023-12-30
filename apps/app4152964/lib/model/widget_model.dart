@@ -444,6 +444,8 @@ class SuricattaDataNavigator {
     final matched = dataValueCollection.firstWhere(where);
     if (matched is BasePathDataValue) {
       possibleRank = matched.rank;
+    } else {
+      possibleRank = null;
     }
     return this;
   }
@@ -475,6 +477,8 @@ class SuricattaDataNavigator {
     });
     if (matched is BasePathDataValue) {
       possibleRank = matched.rank;
+    } else {
+      possibleRank = null;
     }
     return this;
   }
