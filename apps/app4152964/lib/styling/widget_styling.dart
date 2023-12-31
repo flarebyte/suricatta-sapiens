@@ -34,10 +34,6 @@ IconData getNavigationPathStatusIcon(DataStatus status) {
       return Icons.verified;
     case DataStatus.error:
       return Icons.error;
-    case DataStatus.warning:
-      return Icons.warning;
-    case DataStatus.skipped:
-      return Icons.skip_next;
     default:
       return Icons.help;
   }
@@ -62,10 +58,6 @@ Color getNavigationPathStatusColor(DataStatus status) {
       return Colors.blue;
     case DataStatus.error:
       return Colors.red;
-    case DataStatus.warning:
-      return Colors.orange;
-    case DataStatus.skipped:
-      return Colors.grey;
     default:
       return Colors.grey;
   }

@@ -17,7 +17,7 @@ enum ViewStatus {
   minimized,
 }
 
-enum WidgetKind { text, number }
+enum WidgetKind { text, number, choices, multiselect }
 
 enum DataCategory { draft, loaded, refreshed, template, starting, ending }
 
@@ -37,11 +37,15 @@ class PathDataException implements Exception {
   PathDataException(this.message);
 }
 
+List<Message> alwaysPassValidator(
+        {String? text, List<String> otherTexts = const []}) =>
+    [];
+
 class DataMetadata {
   String title;
   WidgetKind widgetKind;
   bool optional;
-  List<Message> Function(String?) validator;
+  List<Message> Function({String? text, List<String> otherTexts}) validator;
   DataMetadata(
       {required this.title,
       required this.widgetKind,
@@ -51,7 +55,7 @@ class DataMetadata {
     return DataMetadata(
       title: '',
       widgetKind: WidgetKind.text,
-      validator: (value) => [],
+      validator: alwaysPassValidator,
     );
   }
 }
@@ -95,6 +99,13 @@ sealed class BaseDataValue {
         PathDataValue(text: var valueText) => valueText,
         StartingSection() => null
       };
+
+  List<String> get otherTexts => switch (this) {
+        EndingSection() => [],
+        PathDataValue(otherTexts: var valueOtherTexts) => valueOtherTexts,
+        StartingSection() => []
+      };
+
   List<Message> get messages => switch (this) {
         EndingSection() => [],
         PathDataValue(messages: var messageList) => messageList,
@@ -209,6 +220,8 @@ class PathDataValue extends BaseDataValue {
   @override
   String? text;
   @override
+  List<String> otherTexts;
+  @override
   List<Message> messages;
 
   PathDataValue({
@@ -219,6 +232,7 @@ class PathDataValue extends BaseDataValue {
     required this.rank,
     required this.category,
     this.text,
+    this.otherTexts = const [],
     this.messages = const [],
   });
 
@@ -231,7 +245,8 @@ class PathDataValue extends BaseDataValue {
           metadata == other.metadata &&
           rank == other.rank &&
           category == other.category &&
-          text == other.text;
+          text == other.text &&
+          otherTexts == other.otherTexts;
 
   @override
   int get hashCode =>
@@ -239,11 +254,12 @@ class PathDataValue extends BaseDataValue {
       metadata.hashCode ^
       rank.hashCode ^
       category.hashCode ^
-      text.hashCode;
+      text.hashCode ^
+      otherTexts.hashCode;
 
   @override
   String toString() {
-    return 'PathDataValue{path: $path, metadata: $metadata, rank: $rank, category: $category, text: $text, status: $status, view status: $viewStatus}';
+    return 'PathDataValue{path: $path, metadata: $metadata, rank: $rank, category: $category, text: $text, otherTexts: ${otherTexts.length}, status: $status, view status: $viewStatus}';
   }
 
   setTextAsString(String newText) {
@@ -252,7 +268,24 @@ class PathDataValue extends BaseDataValue {
       throw PathDataException('Not supported for ${metadata.widgetKind}');
     }
     text = newText;
-    final validationResults = metadata.validator(text);
+    final validationResults = metadata.validator(text: text);
+    final unsuccessful = Message.hasError(validationResults);
+    _status = unsuccessful ? DataStatus.error : DataStatus.populated;
+    messages = validationResults;
+  }
+
+  setViewStatus(ViewStatus newViewStatus) {
+    _viewStatus = newViewStatus;
+  }
+
+  setOtherTextsAsStrings(List<String> newOtherTexts) {
+    final isSupported = metadata.widgetKind == WidgetKind.multiselect;
+    if (!isSupported) {
+      throw PathDataException(
+          'setOtherTextsAsStrings not supported for ${metadata.widgetKind}');
+    }
+    otherTexts = newOtherTexts;
+    final validationResults = metadata.validator(otherTexts: otherTexts);
     final unsuccessful = Message.hasError(validationResults);
     _status = unsuccessful ? DataStatus.error : DataStatus.populated;
     messages = validationResults;

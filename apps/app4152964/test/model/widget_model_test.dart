@@ -4,25 +4,25 @@ import 'package:flutter_test/flutter_test.dart';
 final contactNameMeta = DataMetadata(
     title: 'Contact name',
     widgetKind: WidgetKind.text,
-    validator: (value) => []);
+    validator: alwaysPassValidator);
 final contactCityMeta = DataMetadata(
     title: 'Contact city',
     widgetKind: WidgetKind.text,
-    validator: (value) => []);
+    validator: alwaysPassValidator);
 final contactCountryMeta = DataMetadata(
     title: 'Contact country',
     widgetKind: WidgetKind.text,
-    validator: (value) => []);
+    validator: alwaysPassValidator);
 final contactRegionMeta = DataMetadata(
     title: 'Contact region',
     widgetKind: WidgetKind.text,
-    validator: (value) => []);
+    validator: alwaysPassValidator);
 final contactEmailMeta = DataMetadata(
     title: 'Contact email',
     widgetKind: WidgetKind.text,
-    validator: (value) {
-      if (value is String) {
-        if (value.contains('@')) {
+    validator: ({String? text, List<String> otherTexts = const []}) {
+      if (text is String) {
+        if (text.contains('@')) {
           return [];
         }
       }
