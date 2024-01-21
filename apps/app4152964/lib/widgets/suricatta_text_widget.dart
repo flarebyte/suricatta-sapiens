@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../model/widget_model.dart';
+import '../model/message.dart';
 import '../styling/widget_styling.dart';
 
 class SuricattaTextField extends StatefulWidget {

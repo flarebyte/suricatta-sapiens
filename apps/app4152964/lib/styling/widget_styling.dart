@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../model/widget_model.dart';
+import '../model/data_value.dart';
+import '../model/message.dart';
 
 IconData getLevelIcon(MessageLevel level) {
   switch (level) {

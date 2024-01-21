@@ -2,7 +2,6 @@ import 'package:app4152964/widgets/suricatta_text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import 'model/widget_model.dart';
 import 'validator/widget_validator.dart';
 import 'widgets/suricatta_preview_nav_widget.dart';
 

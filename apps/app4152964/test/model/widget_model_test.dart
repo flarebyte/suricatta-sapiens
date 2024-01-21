@@ -1,4 +1,9 @@
-import 'package:app4152964/model/widget_model.dart';
+
+import 'package:app4152964/model/data_filter.dart';
+import 'package:app4152964/model/data_navigator.dart';
+import 'package:app4152964/model/data_value.dart';
+import 'package:app4152964/model/message.dart';
+import 'package:app4152964/model/validators.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 final contactNameMeta = DataMetadata(
@@ -186,7 +191,7 @@ void main() {
     });
   });
   group('BasePathDataValueFilter', () {
-    final contactName = PathDataValue(
+    final contactName = DataValue(
         status: DataStatus.populated,
         viewStatus: ViewStatus.full,
         path: 'contact/name',

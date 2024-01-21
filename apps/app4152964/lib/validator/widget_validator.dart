@@ -1,4 +1,4 @@
-import '../model/widget_model.dart';
+import '../model/message.dart';
 
 final RegExp regExpForWord = RegExp(r"[\w-._]+");
 
