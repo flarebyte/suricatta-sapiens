@@ -14,6 +14,8 @@ enum ViewStatus {
 
 enum DataCategory { draft, loaded, refreshed, template, starting, ending }
 
+/// Base class to simulate an union type that would take the values:
+/// DataValue, StartingSection, EndingSection
 sealed class BaseDataValue {
   DataStatus _status = DataStatus.todo;
   ViewStatus _viewStatus = ViewStatus.full;
@@ -56,7 +58,10 @@ sealed class BaseDataValue {
         StartingSection() => []
       };
 }
-
+/// Factory to provide sugar functions to create
+/// some, template, start or ending
+/// Note: initially this was part of the base class as
+/// factory methods but we were having issues after refactoring
 class DataValueFactory {
   static DataValue some(
       {required DataStatus status,
@@ -105,25 +110,6 @@ class DataValueFactory {
       status: DataStatus.todo, viewStatus: ViewStatus.full, rank: rank);
 }
 
-/* A class that represents a data value that is associated with a path.
-
-   This class extends the BaseDataValue class, which is an abstract class that defines the common properties and methods for all data values.
-
-   The path property is a string that contains the location of the data value in the file system or the network.
-
-   The metadata property is an object of the DataMetadata class, which contains information about the data value such as its size, type, creation date, etc.
-
-   The rank property is a string that indicates the importance or relevance of the data value. It is overridden from the BaseDataValue class.
-
-   The category property is an object of the DataCategory class, which defines the classification or grouping of the data value based on its content or purpose.
-
-   The text property is a nullable string that contains the main textual content of the data value. It is overridden from the BaseDataValue class.
-
-   The otherTexts property is a list of strings that contains additional textual content of the data value, such as captions, subtitles, annotations, etc.
-
-   The messages property is a list of objects of the Message class, which represents the communication or feedback related to the data value, such as comments, reviews, ratings, etc.
-*/
-
 enum WidgetKind { text, number, choices, multiselect }
 
 class PathDataException implements Exception {
@@ -131,6 +117,8 @@ class PathDataException implements Exception {
   PathDataException(this.message);
 }
 
+/// Metadata for DataValue
+/// This should facilitate the reuse of metadata for different values
 class DataMetadata {
   String title;
   WidgetKind widgetKind;
@@ -150,6 +138,8 @@ class DataMetadata {
   }
 }
 
+/// DataValue is usually used to represent fields that will be edited
+/// by the user. This will include the current state of the field (ex: error)
 class DataValue extends BaseDataValue {
   String path;
   DataMetadata metadata;
@@ -243,12 +233,12 @@ class DataValue extends BaseDataValue {
   }
 }
 
-/* Starting */
 class SectionMetadata {
   String title;
   SectionMetadata({required this.title});
 }
 
+/// This indicates that a new section is starting
 class StartingSection extends BaseDataValue {
   String path;
   SectionMetadata metadata;
@@ -280,8 +270,7 @@ class StartingSection extends BaseDataValue {
   }
 }
 
-/* Ending */
-
+///This indicates that the section is ending
 class EndingSection extends BaseDataValue {
   @override
   String rank;
